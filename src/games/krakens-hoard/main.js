@@ -6,6 +6,7 @@ import { Motion, ease } from '../../shared/motion.js';
 import { wallet, money } from '../../shared/wallet.js';
 import * as M from './math.js';
 import { sfx, play, loop, stopLoop } from './sfx.js';
+import { mountMusicControl } from '../../shared/music-control.js';
 import { makeTextures, GoldText } from './textures.js';
 
 // ---------------------------------------------------------------- layout
@@ -150,7 +151,7 @@ async function start() {
       const expected = Math.round((start - bets + wins) * 100) / 100;
       return { spins: S.ledger.length, bets, wins: Math.round(wins * 100) / 100, expected, balance: wallet.balance, ok: Math.abs(expected - wallet.balance) < 0.011 };
     },
-    S, M, freeSpins, maybeBigWin, presentWin, creditWin, spinOnce, motion, world, app, wallet, get cells() { return cells; },
+    S, M, sfx, freeSpins, maybeBigWin, presentWin, creditWin, spinOnce, motion, world, app, wallet, get cells() { return cells; },
     // drive frames manually (background tabs throttle requestAnimationFrame)
     async run(ms, step = 16) {
       let t = performance.now();
@@ -1702,9 +1703,8 @@ function buildUI() {
   }));
   $('sound').classList.toggle('off', sfx.muted);
   $('sound').onclick = () => { sfx.setMuted(!sfx.muted); $('sound').classList.toggle('off', sfx.muted); };
-  // background music has its own switch – sound effects and the bonus music keep playing
-  $('music').classList.toggle('off', sfx.musicMuted);
-  $('music').onclick = () => { sfx.setMusicMuted(!sfx.musicMuted); $('music').classList.toggle('off', sfx.musicMuted); };
+  // background music: on/off + volume in a touch-friendly panel; effects and bonus music are not affected
+  mountMusicControl($('music'), sfx);
   $('info').onclick = () => { play('click'); renderPaytable(); $('paytable').hidden = false; };
   $('pt-close').onclick = () => ($('paytable').hidden = true);
   $('refill').onclick = () => { wallet.refill(); play('coin'); };

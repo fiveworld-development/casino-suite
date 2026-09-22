@@ -13,6 +13,9 @@ export class Sound {
     // the background music has its own switch: turning it off keeps every sound effect
     // AND the bonus music playing (they do not run through the music bus)
     this.musicMuted = localStorage.getItem('arcade.musicMuted') === '1';
+    // background music sits well under the game by default; the player can set it 0..1
+    const v = Number(localStorage.getItem('arcade.musicVolume'));
+    this.musicVolume = Number.isFinite(v) && localStorage.getItem('arcade.musicVolume') !== null ? Math.min(1, Math.max(0, v)) : 0.35;
     this.ctx = null;
     this.loops = new Map();
   }
@@ -26,7 +29,7 @@ export class Sound {
     const comp = ctx.createDynamicsCompressor();
     this.master.connect(comp).connect(ctx.destination);
     this.musicBus = ctx.createGain(); // only the background music runs through here
-    this.musicBus.gain.value = this.musicMuted ? 0 : 1;
+    this.musicBus.gain.value = this.musicMuted ? 0 : this.musicVolume;
     this.musicBus.connect(this.master);
     this.reverb = this.makeReverb();
     this.reverb.connect(this.master);
@@ -59,7 +62,14 @@ export class Sound {
   setMusicMuted(m) {
     this.musicMuted = m;
     localStorage.setItem('arcade.musicMuted', m ? '1' : '0');
-    if (this.musicBus) this.musicBus.gain.setTargetAtTime(m ? 0 : 1, this.ctx.currentTime, 0.2);
+    if (this.musicBus) this.musicBus.gain.setTargetAtTime(m ? 0 : this.musicVolume, this.ctx.currentTime, 0.2);
+  }
+
+  /** Background music volume 0..1 (saved, shared by all games). */
+  setMusicVolume(v) {
+    this.musicVolume = Math.min(1, Math.max(0, v));
+    localStorage.setItem('arcade.musicVolume', String(this.musicVolume));
+    if (this.musicBus && !this.musicMuted) this.musicBus.gain.setTargetAtTime(this.musicVolume, this.ctx.currentTime, 0.05);
   }
 
   makeReverb() {
