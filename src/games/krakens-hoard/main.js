@@ -141,8 +141,7 @@ async function start() {
   });
   layout();
   app.ticker.add(tick);
-  loop('ocean');
-  loop('music'); // procedural sea shanty (or sfx/music.mp3 when present)
+  loop('music', { music: true }); // ocean recording (sfx/music.mp3), else the procedural shanty
 
   if (new URLSearchParams(location.search).has('debug')) window.KH = {
     // ledger audit: balance must equal start − Σbets + Σwins
@@ -1369,9 +1368,7 @@ async function freeSpinsRound(setup, label, betOverride) {
   krakenRises();
   await banner(L('kh.fsBanner', { n: setup.spins }), label, 'fsStart');
   stopLoop('music', 1.2);
-  stopLoop('ocean');
-  loop('storm');
-  loop('musicStorm');
+  loop('musicStorm', { music: true });
   motion.tween(bgFree, { alpha: 1 }, 1500);
   lightningAt = performance.now() + 800;
   drawMeter(S.fs.meter, false);
@@ -1409,10 +1406,8 @@ async function freeSpinsRound(setup, label, betOverride) {
   drawMeter(S.meter, false); // back to the base-game Kraken meter
   krakenSinks();
   clearBadges();
-  stopLoop('storm');
   stopLoop('musicStorm', 1.2);
-  loop('ocean');
-  loop('music');
+  loop('music', { music: true });
   motion.tween(bgFree, { alpha: 0 }, 1500);
   motion.tween(hud.fs, { alpha: 0 }, 500);
   hideTumble();
@@ -1461,6 +1456,8 @@ async function sailOn(res, bet) {
 /** Treasure pick: nine chests, the player opens three. Values were drawn by the math up front. */
 async function chestPick(scale, bonusBet) {
   const { chests } = M.chestBonus(scale);
+  stopLoop('music', 1.2);
+  loop('musicStorm', { music: true });
   const d = dimmer();
   motion.tween(d, { alpha: 0.72 }, 300);
   const box = centerBox();
@@ -1528,6 +1525,8 @@ async function chestPick(scale, bonusBet) {
   });
   await fadeOverlay(d, box);
   if (total > 0) await creditWin(total);
+  stopLoop('musicStorm', 1.2);
+  loop('music', { music: true });
   return total;
 }
 
@@ -1703,6 +1702,9 @@ function buildUI() {
   }));
   $('sound').classList.toggle('off', sfx.muted);
   $('sound').onclick = () => { sfx.setMuted(!sfx.muted); $('sound').classList.toggle('off', sfx.muted); };
+  // background music has its own switch – sound effects and the bonus music keep playing
+  $('music').classList.toggle('off', sfx.musicMuted);
+  $('music').onclick = () => { sfx.setMusicMuted(!sfx.musicMuted); $('music').classList.toggle('off', sfx.musicMuted); };
   $('info').onclick = () => { play('click'); renderPaytable(); $('paytable').hidden = false; };
   $('pt-close').onclick = () => ($('paytable').hidden = true);
   $('refill').onclick = () => { wallet.refill(); play('coin'); };

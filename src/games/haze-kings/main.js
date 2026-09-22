@@ -115,8 +115,7 @@ async function start() {
   });
   layout();
   app.ticker.add(tick);
-  loop('music');
-  loop('vinyl'); // lounge room tone under everything
+  loop('music', { music: true });
 
   if (params.has('debug')) window.HK = {
     audit(start) {
@@ -877,8 +876,7 @@ async function freeSpins(award, cloud9, opts = {}) {
   S.fs = null;
   document.body.classList.remove('fs');
   stopLoop('musicBonus', 1.5);
-  loop('music');
-  loop('vinyl'); // lounge room tone under everything
+  loop('music', { music: true });
   clearHotbox();
   motion.tween(bgFree, { alpha: 0 }, 1200);
   motion.tween(hud.fs, { alpha: 0 }, 500).then(() => (hud.fs.visible = false));
@@ -1158,6 +1156,9 @@ function buildUI() {
   }));
   $('sound').classList.toggle('off', sfx.muted);
   $('sound').onclick = () => { sfx.setMuted(!sfx.muted); $('sound').classList.toggle('off', sfx.muted); };
+  // background music has its own switch – sound effects and the bonus music keep playing
+  $('music').classList.toggle('off', sfx.musicMuted);
+  $('music').onclick = () => { sfx.setMusicMuted(!sfx.musicMuted); $('music').classList.toggle('off', sfx.musicMuted); };
   $('info').onclick = () => { play('click'); renderPaytable(); $('paytable').hidden = false; };
   $('pt-close').onclick = () => ($('paytable').hidden = true);
   $('refill').onclick = () => { wallet.refill(); play('coin'); };

@@ -1,5 +1,5 @@
 // Haze Kings 420 – sound identity: DUB / TRAP.
-// 808 sub bass, tape echo on everything, dub sirens, offbeat skank stabs, vinyl crackle and an
+// 808 sub bass, tape echo on everything, dub sirens, offbeat skank stabs and an
 // airhorn for the features. Deliberately shares nothing with Kraken's Hoard (orchestral/maritime).
 // Each entry is a synth fallback; a real file at public/assets/haze-kings/sfx/<name>.mp3 wins.
 import { Sound, midi } from '../../shared/sound.js';
@@ -157,18 +157,12 @@ const R = {
   click: (s) => s.noiseHit({ dur: 0.03, vol: 0.09, type: 'bandpass', freq: 2500, q: 2, wet: 0 }),
   error: (s) => s.tone({ type: 'sawtooth', freq: 120, to: 90, dur: 0.28, vol: 0.12, wet: 0.1 }),
   // ---- loops ----
-  vinyl: (s) => {
-    // vinyl crackle + room tone under the reggae: the lounge never feels silent
-    const crackle = s.noiseHit({ dur: 1, vol: 0.012, type: 'highpass', freq: 5200, loop: true, attack: 2, wet: 0.2 });
-    const room = s.noiseHit({ dur: 1, vol: 0.02, type: 'lowpass', freq: 320, loop: true, attack: 3, wet: 0.4 });
-    return { stop: (f) => { crackle.stop(f); room.stop(f); } };
-  },
   // procedural soundtrack (replaced automatically by sfx/music.mp3 / musicBonus.mp3 if present)
-  music: (s) => startMusic(s, 'reggae', { vol: 0.45 }),
-  musicBonus: (s) => startMusic(s, 'trap', { vol: 0.5 }),
+  music: (s) => startMusic(s, 'reggae', { vol: 0.45 }), // replaced by sfx/music.mp3 when present
+  musicBonus: (s) => startMusic(s, 'trap', { vol: 0.5, music: false }), // bonus music keeps playing when the music switch is off
 };
 
-export const sfx = new Sound(`${import.meta.env.BASE_URL}assets/haze-kings/sfx`, Object.keys(R), ['bigWin', 'coinLoop']); // real recordings in public/assets (see THIRD_PARTY.md)
+export const sfx = new Sound(`${import.meta.env.BASE_URL}assets/haze-kings/sfx`, Object.keys(R), ['bigWin', 'coinLoop', 'music']); // real recordings in public/assets (see THIRD_PARTY.md)
 export const play = (name, opts) => sfx.play(name, R[name], opts);
 export const loop = (name, opts) => sfx.loop(name, R[name], opts);
 export const stopLoop = (name, fade) => sfx.stopLoop(name, fade);

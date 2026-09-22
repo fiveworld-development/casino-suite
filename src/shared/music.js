@@ -13,7 +13,7 @@ const PROGRESSIONS = {
   tempest: [[50, 53, 57], [48, 51, 55], [46, 50, 53], [45, 49, 52]], // Dm Cm Bb A
 };
 
-export function startMusic(s, style = 'reggae', { vol = 0.5 } = {}) {
+export function startMusic(s, style = 'reggae', { vol = 0.5, music = true } = {}) {
   const ctx = s.ctx;
   const bus = ctx.createGain();
   bus.gain.value = 0;
@@ -21,7 +21,7 @@ export function startMusic(s, style = 'reggae', { vol = 0.5 } = {}) {
   const lp = ctx.createBiquadFilter(); // warm "tape" top end
   lp.type = 'lowpass';
   lp.frequency.value = style === 'reggae' ? 5200 : style === 'shanty' ? 3800 : style === 'tempest' ? 5000 : 9000;
-  bus.connect(lp).connect(s.master);
+  bus.connect(lp).connect(music && s.musicBus ? s.musicBus : s.master);
   const verb = ctx.createGain();
   verb.gain.value = 0.25;
   bus.connect(verb).connect(s.reverb);

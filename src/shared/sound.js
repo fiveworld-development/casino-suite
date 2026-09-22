@@ -8,7 +8,11 @@ export class Sound {
     this.names = names;
     this.available = new Set(files);
     this.files = new Map();
+    this.pending = new Map(); // name -> promise, for big files still downloading
     this.muted = localStorage.getItem('arcade.muted') === '1';
+    // the background music has its own switch: turning it off keeps every sound effect
+    // AND the bonus music playing (they do not run through the music bus)
+    this.musicMuted = localStorage.getItem('arcade.musicMuted') === '1';
     this.ctx = null;
     this.loops = new Map();
   }
@@ -21,25 +25,41 @@ export class Sound {
     this.master.gain.value = this.muted ? 0 : 0.8;
     const comp = ctx.createDynamicsCompressor();
     this.master.connect(comp).connect(ctx.destination);
+    this.musicBus = ctx.createGain(); // only the background music runs through here
+    this.musicBus.gain.value = this.musicMuted ? 0 : 1;
+    this.musicBus.connect(this.master);
     this.reverb = this.makeReverb();
     this.reverb.connect(this.master);
     const len = ctx.sampleRate * 2;
     this.noise = ctx.createBuffer(1, len, ctx.sampleRate);
     const d = this.noise.getChannelData(0);
     for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
-    await Promise.all(this.names.filter((n) => this.available.has(n)).map(async (n) => {
+
+    const load = async (n) => {
       try {
         const r = await fetch(`${this.base}/${n}.mp3`);
         if (!r.ok || !r.headers.get('content-type')?.includes('audio')) return;
         this.files.set(n, await ctx.decodeAudioData(await r.arrayBuffer()));
       } catch { /* synth fallback */ }
-    }));
+    };
+    const wanted = this.names.filter((n) => this.available.has(n));
+    // music tracks are minutes long – load them in the background so the game starts instantly
+    const music = wanted.filter((n) => n.startsWith('music'));
+    for (const n of music) this.pending.set(n, load(n));
+    await Promise.all(wanted.filter((n) => !n.startsWith('music')).map(load));
   }
 
   setMuted(m) {
     this.muted = m;
     localStorage.setItem('arcade.muted', m ? '1' : '0');
     if (this.master) this.master.gain.setTargetAtTime(m ? 0 : 0.8, this.ctx.currentTime, 0.05);
+  }
+
+  /** Background music on/off – independent of the global sound switch. */
+  setMusicMuted(m) {
+    this.musicMuted = m;
+    localStorage.setItem('arcade.musicMuted', m ? '1' : '0');
+    if (this.musicBus) this.musicBus.gain.setTargetAtTime(m ? 0 : 1, this.ctx.currentTime, 0.2);
   }
 
   makeReverb() {
@@ -57,7 +77,7 @@ export class Sound {
     return Object.assign(conv, { out: g, connect: (n) => g.connect(n) });
   }
 
-  /** Play a named sound. opts: { vol, rate, loop } */
+  /** Play a named sound. opts: { vol, rate, loop, music } – music routes through the music bus. */
   play(name, synth, opts = {}) {
     if (!this.ctx || this.muted) return null;
     const buf = this.files.get(name);
@@ -68,15 +88,27 @@ export class Sound {
       src.playbackRate.value = opts.rate ?? 1;
       const g = this.ctx.createGain();
       g.gain.value = opts.vol ?? 1;
-      src.connect(g).connect(this.master);
+      src.connect(g).connect(opts.music ? this.musicBus : this.master);
       src.start();
       return { stop: (fade = 0.3) => { g.gain.setTargetAtTime(0, this.ctx.currentTime, fade / 3); src.stop(this.ctx.currentTime + fade); } };
     }
     return synth?.(this, opts) ?? null;
   }
 
-  loop(name, synth, opts) {
+  loop(name, synth, opts = {}) {
     if (this.loops.has(name)) return;
+    // a music track may still be downloading – start it as soon as it arrives, unless it was stopped meanwhile
+    const waiting = this.pending.get(name);
+    if (waiting && !this.files.has(name)) {
+      const token = {};
+      this.loops.set(name, { token, stop: () => this.loops.delete(name) });
+      waiting.then(() => {
+        if (this.loops.get(name)?.token !== token) return; // stopped while loading
+        this.loops.delete(name);
+        this.loop(name, synth, opts);
+      });
+      return;
+    }
     const h = this.play(name, synth, { ...opts, loop: true });
     if (h) this.loops.set(name, h);
   }

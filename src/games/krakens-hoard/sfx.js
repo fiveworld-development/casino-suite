@@ -1,5 +1,5 @@
 // Kraken's Hoard – sound identity: ORCHESTRAL / MARITIME.
-// Brass horns, taiko drums, a low choir, creaking wood and a layered ocean.
+// Brass horns, taiko drums, a low choir and creaking wood.
 // Deliberately shares nothing with Haze Kings (dub/trap) – each machine has its own voice.
 // Each entry is a synth fallback; a real file at public/assets/krakens-hoard/sfx/<name>.mp3 wins.
 import { Sound, midi } from '../../shared/sound.js';
@@ -156,38 +156,12 @@ const R = {
   click: (s) => s.tone({ type: 'triangle', freq: 760, to: 520, dur: 0.06, vol: 0.12, wet: 0.05 }),
   error: (s) => s.tone({ type: 'triangle', freq: 150, to: 110, dur: 0.3, vol: 0.14, wet: 0.1 }),
   // ---- loops ----
-  ocean: (s) => {
-    // premium surf: deep swell + fine spray + slowly breathing waves, always behind the game
-    const ctx = s.ctx;
-    const swell = s.noiseHit({ dur: 1, vol: 0.03, type: 'lowpass', freq: 340, q: 0.4, loop: true, attack: 4, wet: 0.5 });
-    const spray = s.noiseHit({ dur: 1, vol: 0.008, type: 'bandpass', freq: 2200, q: 0.5, loop: true, attack: 5, wet: 0.6 });
-    // three slow LFOs at unrelated rates: the waves never fall into an obvious pattern
-    const mk = (rate, depth, target) => {
-      const lfo = ctx.createOscillator(), g = ctx.createGain();
-      lfo.frequency.value = rate; g.gain.value = depth;
-      lfo.connect(g).connect(target); lfo.start();
-      return lfo;
-    };
-    const l1 = mk(0.055, 200, swell.f.frequency);
-    const l2 = mk(0.031, 0.012, spray.g.gain);
-    const l3 = mk(0.017, 0.02, swell.g.gain);
-    return { stop: (f) => { swell.stop(f); spray.stop(f); [l1, l2, l3].forEach((l) => l.stop(ctx.currentTime + f)); } };
-  },
-  storm: (s) => {
-    // rain on the deck plus wind, kept dark so it never hisses
-    const rain = s.noiseHit({ dur: 1, vol: 0.03, type: 'bandpass', freq: 1800, q: 0.7, loop: true, attack: 2, wet: 0.35 });
-    const wind = s.noiseHit({ dur: 1, vol: 0.05, type: 'lowpass', freq: 420, q: 1.2, loop: true, attack: 2.5, wet: 0.5 });
-    const lfo = s.ctx.createOscillator(), lg = s.ctx.createGain();
-    lfo.frequency.value = 0.14; lg.gain.value = 180;
-    lfo.connect(lg).connect(wind.f.frequency); lfo.start();
-    return { stop: (f) => { rain.stop(f); wind.stop(f); lfo.stop(s.ctx.currentTime + f); } };
-  },
   // procedural soundtrack: a slow sea shanty on deck, the storm version in the free spins
   music: (s) => startMusic(s, 'shanty', { vol: 0.42 }),
   musicStorm: (s) => startMusic(s, 'tempest', { vol: 0.48 }),
 };
 
-export const sfx = new Sound(`${import.meta.env.BASE_URL}assets/krakens-hoard/sfx`, Object.keys(R), ['bigWin', 'coinLoop']); // real recordings in public/assets (see THIRD_PARTY.md)
+export const sfx = new Sound(`${import.meta.env.BASE_URL}assets/krakens-hoard/sfx`, Object.keys(R), ['bigWin', 'coinLoop', 'music', 'musicStorm']); // real recordings in public/assets (see THIRD_PARTY.md)
 export const play = (name, opts) => sfx.play(name, R[name], opts);
 export const loop = (name, opts) => sfx.loop(name, R[name], opts);
 export const stopLoop = (name, fade) => sfx.stopLoop(name, fade);
