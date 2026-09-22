@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#04100b">
+  <title>Blackjack – Haze Kings Lounge</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Cinzel:wght@800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/src/tables/lounge.css">
+  <link rel="stylesheet" href="/src/shared/loader.css">
+</head>
+<body class="bj">
+  <div id="stage"></div>
+
+  <div id="loader" style="--loader-bg:url('/assets/tables/bg_room.webp')">
+    <img src="/assets/blackjack/logo_blackjack.webp" alt="Blackjack" class="load-logo">
+    <div class="load-track"><div id="load-bar"></div></div>
+    <div id="load-text" data-i18n="bj.loading">Der Tisch wird gedeckt…</div>
+    <button id="load-start" class="cta" hidden data-i18n="load.play">Spielen</button>
+    <p class="load-note" data-i18n="load.note">Spielgeld · Kein Echtgeld · 18+</p>
+  </div>
+
+  <header class="topbar" id="topbar" hidden>
+    <a class="round-btn lobby-back" href="/" title="Lobby" data-i18n-aria="tb.toLobby" aria-label="Zur Lobby">
+      <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>
+    </a>
+    <img class="top-logo" src="/assets/blackjack/logo_blackjack.webp" alt="Blackjack">
+    <div class="stats">
+      <div class="stat"><span class="lbl" data-i18n="tb.balance">Guthaben</span><b id="balance">0,00</b><button class="refill" id="refill" data-i18n-title="common.refill" title="Spielgeld auffüllen">+</button></div>
+      <div class="stat"><span class="lbl" data-i18n="tb.bet">Einsatz</span><b id="bet-total">0,00</b></div>
+      <div class="stat win"><span class="lbl" data-i18n="tb.win">Gewinn</span><b id="last-win">–</b></div>
+    </div>
+    <button class="round-btn" id="btn-sound" data-i18n-title="common.sound" title="Ton" data-i18n-aria="tb.soundToggle" aria-label="Ton an/aus">
+      <svg viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z"/><path class="wave" d="M16.5 8.5a5 5 0 010 7M19 6a8.5 8.5 0 010 12"/></svg>
+    </button>
+    <button class="round-btn" id="btn-help" data-i18n-title="tb.rules" title="Regeln" data-i18n-aria="tb.rules" aria-label="Regeln">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg>
+    </button>
+  </header>
+
+  <footer class="dock" id="dock" hidden>
+    <!-- betting -->
+    <div class="dock-row" id="bet-row">
+      <div class="chip-rack" id="chip-rack"></div>
+      <div class="actions">
+        <button class="act ghost" id="btn-clear"><i><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></i><span data-i18n="bj.clear">Löschen</span></button>
+        <button class="act ghost" id="btn-rebet"><i><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 11-2.34-5.66"/><path d="M20 4v5h-5"/></svg></i><span data-i18n="bj.rebet">Wie zuvor</span></button>
+        <button class="act ghost" id="btn-x2"><i class="txt">2×</i><span data-i18n="bj.double">Verdoppeln</span></button>
+        <button class="act cta" id="btn-deal"><span data-i18n="bj.deal">AUSTEILEN</span></button>
+      </div>
+    </div>
+    <!-- playing -->
+    <div class="dock-row" id="play-row" hidden>
+      <div class="actions play">
+        <button class="act hit" id="btn-hit"><i><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></i><span data-i18n="bj.hit">Karte</span></button>
+        <button class="act stand" id="btn-stand"><i><svg viewBox="0 0 24 24"><rect x="6.5" y="6.5" width="11" height="11" rx="2.5"/></svg></i><span data-i18n="bj.stand">Stehen</span></button>
+        <button class="act double" id="btn-double"><i class="txt">2×</i><span data-i18n="bj.double">Verdoppeln</span></button>
+        <button class="act split" id="btn-split"><i><svg viewBox="0 0 24 24"><path d="M8 5L4 9l4 4M4 9h11M16 11l4 4-4 4M20 15H9"/></svg></i><span data-i18n="bj.split">Teilen</span></button>
+      </div>
+    </div>
+    <div class="dock-hint" id="dock-hint" data-i18n="bj.hintStart">Chip unten antippen, um zu setzen.</div>
+  </footer>
+
+  <div class="modal" id="insurance" hidden>
+    <div class="modal-card">
+      <h3 data-i18n="bj.insTitle">Dealer zeigt ein Ass</h3>
+      <p id="ins-text" data-i18n="bj.insText">Versicherung kostet die Hälfte deines Einsatzes und zahlt 2:1, wenn der Dealer Blackjack hat.</p>
+      <div class="modal-actions">
+        <button class="act cta" id="btn-even-money" hidden><span>Even Money</span></button>
+        <button class="act cta" id="btn-ins-yes"><span data-i18n="bj.insYes">Versichern</span></button>
+        <button class="act ghost" id="btn-ins-no"><span data-i18n="bj.insNo">Nein danke</span></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="help" hidden>
+    <div class="modal-card wide">
+      <button class="round-btn close" id="help-close" data-i18n-aria="common.close" aria-label="Schließen">✕</button>
+      <h3 data-i18n="bj.rulesTitle">Blackjack – Regeln</h3>
+      <ul data-i18n-html="bj.rules">
+        <li>Ziel: näher an 21 als der Dealer, ohne 21 zu überschreiten.</li>
+        <li>Bildkarten zählen 10, Asse 1 oder 11 – angezeigt wird immer die beste Summe.</li>
+        <li><b>Blackjack</b> (Ass + 10er mit den ersten zwei Karten) zahlt <b>3:2</b>.</li>
+        <li>Dealer zieht bis 16 und steht auf allen 17 (auch Soft 17).</li>
+        <li><b>Verdoppeln</b> auf zwei beliebige Karten, auch nach dem Teilen.</li>
+        <li><b>Teilen</b> bis zu 4 Hände. Asse nur einmal, mit je einer Karte.</li>
+        <li><b>Versicherung</b> bei Dealer-Ass, zahlt 2:1. Dealer prüft auf Blackjack.</li>
+        <li>6 Decks, gemischt wird nach ca. 75 % des Schuhs. Faires Mischen, kein Kartenzählen-Schutz nötig – nur Spielgeld.</li>
+      </ul>
+    </div>
+  </div>
+
+  <script type="module" src="/src/tables/blackjack/main.js"></script>
+</body>
+</html>

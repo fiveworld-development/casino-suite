@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#04100b">
+  <title>Poker – Haze Kings Lounge</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Cinzel:wght@800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/src/tables/lounge.css">
+  <link rel="stylesheet" href="/src/tables/poker/style.css">
+  <link rel="stylesheet" href="/src/shared/loader.css">
+</head>
+<body class="pk">
+  <div id="stage"></div>
+
+  <div id="loader" style="--loader-bg:url('/assets/tables/bg_room.webp')">
+    <img src="/assets/poker/logo_poker.webp" alt="Texas Hold'em" class="load-logo">
+    <div class="load-track"><div id="load-bar"></div></div>
+    <div id="load-text" data-i18n="pk.loading">Die Karten werden gemischt…</div>
+    <button id="load-start" class="cta" hidden data-i18n="load.play">Spielen</button>
+    <p class="load-note" data-i18n="load.note">Spielgeld · Kein Echtgeld · 18+</p>
+  </div>
+
+  <header class="topbar" id="topbar" hidden>
+    <a class="round-btn lobby-back" href="/" title="Lobby" data-i18n-aria="tb.toLobby" aria-label="Zur Lobby">
+      <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>
+    </a>
+    <div class="seg" role="tablist">
+      <button id="tab-holdem" class="on" role="tab">Hold'em</button>
+      <button id="tab-vp" role="tab">Kush or Better</button>
+    </div>
+    <div class="stats">
+      <div class="stat"><span class="lbl" data-i18n="tb.balance">Guthaben</span><b id="balance">0,00</b><button class="refill" id="refill" data-i18n-title="common.refill" title="Spielgeld auffüllen">+</button></div>
+      <div class="stat" id="stat-2"><span class="lbl" id="stat-2-lbl" data-i18n="pk.atTable">Am Tisch</span><b id="stat-2-val">–</b></div>
+      <div class="stat win"><span class="lbl" id="stat-3-lbl">Pot</span><b id="stat-3-val">–</b></div>
+    </div>
+    <button class="round-btn" id="btn-sound" data-i18n-title="common.sound" title="Ton" data-i18n-aria="tb.soundToggle" aria-label="Ton an/aus">
+      <svg viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z"/><path class="wave" d="M16.5 8.5a5 5 0 010 7M19 6a8.5 8.5 0 010 12"/></svg>
+    </button>
+    <button class="round-btn" id="btn-help" data-i18n-title="tb.rules" title="Regeln" data-i18n-aria="tb.rules" aria-label="Regeln">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg>
+    </button>
+  </header>
+
+  <!-- ===== Hold'em dock ===== -->
+  <footer class="dock" id="dock-holdem" hidden>
+    <div class="dock-row" id="hd-idle">
+      <div class="actions">
+        <button class="act ghost" id="hd-speed"><i><svg viewBox="0 0 24 24"><path d="M4 6l7 6-7 6zM13 6l7 6-7 6z"/></svg></i><span id="hd-speed-lbl" data-i18n="pk.speed">Tempo: Normal</span></button>
+        <button class="act ghost" id="hd-leave" hidden><i><svg viewBox="0 0 24 24"><path d="M14 4h5v16h-5M10 8l-4 4 4 4M6 12h10"/></svg></i><span data-i18n="pk.leave">Aufstehen</span></button>
+        <button class="act cta" id="hd-sit"><span data-i18n="pk.sit">PLATZ NEHMEN · 1.000</span></button>
+      </div>
+    </div>
+    <div class="dock-row" id="hd-turn" hidden>
+      <div class="raise-box" id="raise-box">
+        <div class="presets">
+          <button id="rz-min">Min</button><button id="rz-half">½ Pot</button><button id="rz-pot">Pot</button><button id="rz-all">All-in</button>
+        </div>
+        <input type="range" id="rz-slider" min="0" max="100" step="5" value="0" data-i18n-aria="pk.raiseAmount" aria-label="Raise-Betrag">
+      </div>
+      <div class="actions play">
+        <button class="act stand" id="hd-fold"><i><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></i><span>Fold</span></button>
+        <button class="act hit" id="hd-call"><i id="hd-call-i"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></i><span id="hd-call-lbl">Check</span></button>
+        <button class="act double" id="hd-raise"><i><svg viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></svg></i><span id="hd-raise-lbl">Raise</span></button>
+      </div>
+    </div>
+    <div class="dock-hint" id="hd-hint" data-i18n="pk.hintStart">Setz dich an den Tisch – 5 Gegner warten.</div>
+  </footer>
+
+  <!-- ===== Video poker dock ===== -->
+  <footer class="dock" id="dock-vp" hidden>
+    <div class="dock-row">
+      <div class="coins">
+        <button class="round-btn" id="vp-minus" data-i18n-aria="pk.less" aria-label="Weniger">−</button>
+        <div class="stat"><span class="lbl" data-i18n="tb.bet">Einsatz</span><b id="vp-coins">5</b></div>
+        <button class="round-btn" id="vp-plus" data-i18n-aria="pk.more" aria-label="Mehr">+</button>
+      </div>
+      <div class="actions">
+        <button class="act ghost" id="vp-hint"><i><svg viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 00-3.9 10.6c.8.7 1.2 1.5 1.2 2.4h5.4c0-.9.4-1.7 1.2-2.4A6 6 0 0012 3z"/></svg></i><span data-i18n="pk.tip">Tipp</span></button>
+        <button class="act cta" id="vp-deal"><span data-i18n="pk.deal">GEBEN</span></button>
+      </div>
+    </div>
+    <div class="dock-hint" id="vp-msg" data-i18n="pk.vpStart">Einsatz wählen und „Geben“. Dann Karten zum Halten antippen.</div>
+  </footer>
+
+  <aside class="paytable" id="vp-paytable" hidden></aside>
+
+  <div class="modal" id="help" hidden>
+    <div class="modal-card wide">
+      <button class="round-btn close" id="help-close" data-i18n-aria="common.close" aria-label="Schließen">✕</button>
+      <h3>Texas Hold'em</h3>
+      <ul data-i18n-html="pk.rulesHoldem">
+        <li>No-Limit, Blinds 5 / 10. Buy-in 1.000 aus deinem Guthaben – beim Aufstehen geht dein Tisch-Stack zurück.</li>
+        <li>Du bekommst 2 Karten, dazu kommen 5 Gemeinschaftskarten. Die beste 5-Karten-Hand gewinnt.</li>
+        <li>5 KI-Gegner mit eigenem Stil: The Kingpin, Lucky Mary, Blaze, Dr. Kush, Couch Rookie. Die KI sieht nie deine Karten.</li>
+      </ul>
+      <h3 style="margin-top:18px">Kush or Better</h3>
+      <ul data-i18n-html="pk.rulesVp">
+        <li>Video Poker nach „Jacks or Better 9/6“: 5 Karten, Karten halten, einmal ziehen.</li>
+        <li>Gewinn ab einem Paar Buben. Royal Flush zahlt bei 5 Münzen 4.000.</li>
+        <li>„Tipp“ zeigt die rechnerisch beste Entscheidung.</li>
+      </ul>
+    </div>
+  </div>
+
+  <script type="module" src="/src/tables/poker/main.js"></script>
+</body>
+</html>

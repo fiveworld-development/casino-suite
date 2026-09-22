@@ -1,0 +1,50 @@
+/* Blackjack table page chrome. Table felt / cards are rendered on the Pixi canvas (#stage). */
+html, body { margin: 0; height: 100%; background: #06120e; color: #f2dca0; font-family: 'Inter', sans-serif; }
+#stage { position: fixed; inset: 0; }
+#stage canvas { width: 100%; height: 100%; display: block; }
+
+#loader {
+  position: fixed; inset: 0; z-index: 50;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+  background: radial-gradient(ellipse at 50% 30%, #0c3d2c 0%, #04140f 70%);
+  transition: opacity 0.9s ease;
+}
+#loader.gone { opacity: 0; pointer-events: none; }
+.load-logo { width: min(70vw, 420px); filter: drop-shadow(0 0 30px rgba(57,255,156,.35)); }
+.load-track { width: min(60vw, 320px); height: 6px; background: rgba(255,255,255,.15); border-radius: 4px; overflow: hidden; }
+#load-bar { height: 100%; width: 0; background: linear-gradient(90deg, #d9b45c, #39ff9c); transition: width .2s; }
+#load-text { font-family: 'Cinzel Decorative', serif; font-size: 14px; letter-spacing: .05em; }
+#load-start { font-family: 'Cinzel Decorative', serif; padding: 14px 40px; border-radius: 12px; border: 1px solid #d9b45c;
+  background: linear-gradient(180deg, #f2dca0, #d9b45c); color: #0a0e10; font-size: 16px; cursor: pointer; min-height: 44px; }
+.load-note { font-size: 11px; opacity: .6; }
+
+.lobby-back {
+  position: fixed; top: calc(10px + var(--sai-top, 0px)); left: calc(10px + var(--sai-left, 0px)); z-index: 25;
+  width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  background: rgba(6,15,12,.65); border: 1px solid #d9b45c; color: #f2dca0;
+}
+.lobby-back svg { width: 20px; height: 20px; }
+
+#hud { position: fixed; top: 0; left: 0; right: 0; z-index: 15; pointer-events: none; text-align: center; }
+#rules-strip {
+  margin-top: calc(6px + var(--sai-top, 0px)); font-family: 'Cinzel Decorative', serif; font-size: 10px;
+  letter-spacing: .08em; color: rgba(242,220,160,.55);
+}
+.banner {
+  position: fixed; top: 38%; left: 50%; transform: translate(-50%, -50%);
+  font-family: 'Cinzel Decorative', serif; font-size: clamp(22px, 5vw, 48px); font-weight: 900;
+  color: #f2dca0; text-shadow: 0 0 24px rgba(57,255,156,.6), 0 2px 6px #000; z-index: 30;
+}
+
+@media (orientation: portrait) {
+  .table-ui { flex-direction: row; }
+}
+
+.insurance-ui {
+  position: fixed; bottom: auto; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  background: rgba(6, 18, 14, .92); border: 1px solid #d9b45c; border-radius: 16px;
+  padding: 18px 22px; flex-direction: column; gap: 12px; z-index: 40; max-width: 90vw;
+}
+.insurance-ui .insurance-label { font-family: 'Cinzel Decorative', serif; font-size: 13px; text-align: center; color: #f2dca0; }
+
+.shuffle-banner { font-size: clamp(16px, 4vw, 30px); }

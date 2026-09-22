@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#070b10">
+  <meta name="description" content="Casino Suite – premium play-money casino games for the web: two slots, Blackjack and Texas Hold'em. Built with PixiJS.">
+  <title>Casino Suite</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/src/shared/loader.css">
+  <link rel="stylesheet" href="/src/lobby.css">
+</head>
+<body>
+  <header class="top">
+    <div class="brand"><span class="dot"></span>CASINO <b>SUITE</b></div>
+    <div class="right">
+      <div class="wallet">
+        <span class="tag" data-i18n="common.playMoney">Spielgeld</span>
+        <b id="balance">0,00</b>
+        <button id="refill" data-i18n="lobby.refill">Auffüllen</button>
+      </div>
+      <div id="lang"></div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1 data-i18n="lobby.title">Willkommen in der Lounge</h1>
+      <p data-i18n="lobby.sub">Vier Spiele, ein Guthaben. Ehrliche Zufallszahlen, geprüfte Auszahlungsquoten – und nur Spielgeld.</p>
+    </section>
+
+    <div class="blocks">
+    <div class="block">
+    <h2 data-i18n="lobby.slots">Slots</h2>
+    <section class="grid">
+      <a class="card" href="/krakens-hoard.html" style="--glow:#39c6ff">
+        <img src="/assets/krakens-hoard/bg_main.webp" alt="" class="bg" loading="lazy">
+        <img src="/assets/krakens-hoard/logo.webp" alt="Kraken's Hoard" class="logo">
+        <div class="meta"><b>Kraken's Hoard</b><span data-i18n="lobby.khMeta">Tumble · Wachsende Walzen · 10.000x</span><em>RTP 98 %</em></div>
+      </a>
+      <a class="card" href="/haze-kings.html" style="--glow:#4dff9a">
+        <img src="/assets/haze-kings/bg_main.webp" alt="" class="bg" loading="lazy">
+        <img src="/assets/haze-kings/logo.webp" alt="Haze Kings 420" class="logo">
+        <div class="meta"><b>Haze Kings 420</b><span data-i18n="lobby.hkMeta">Cluster · Hotbox bis x64 · 5.000x</span><em>RTP 98 %</em></div>
+      </a>
+    </section>
+    </div>
+    <div class="block">
+    <h2 data-i18n="lobby.tables">Tischspiele</h2>
+    <section class="grid">
+      <a class="card" href="/blackjack.html" style="--glow:#f2c350">
+        <img src="/assets/tables/bg_room.webp" alt="" class="bg" loading="lazy">
+        <img src="/assets/blackjack/logo_blackjack.webp" alt="Blackjack" class="logo">
+        <div class="meta"><b>Blackjack</b><span data-i18n="lobby.bjMeta">6 Decks · Blackjack zahlt 3:2</span><em data-i18n="lobby.bjEdge">Hausvorteil ca. 0,4 %</em></div>
+      </a>
+      <a class="card" href="/poker.html" style="--glow:#ff79b8">
+        <img src="/assets/tables/bg_room.webp" alt="" class="bg" loading="lazy">
+        <img src="/assets/poker/logo_poker.webp" alt="Texas Hold'em" class="logo">
+        <div class="meta"><b>Texas Hold'em</b><span data-i18n="lobby.pkMeta">5 KI-Gegner · Kush or Better Video Poker</span><em>No-Limit</em></div>
+      </a>
+    </section>
+    </div>
+    </div>
+
+    <footer class="foot">
+      <p data-i18n="lobby.note">Nur Spielgeld – kein Echtgeld, keine Einzahlung, keine Auszahlung. 18+</p>
+      <p class="credit">Casino Suite © <a href="https://github.com/fiveworld-development/casino-suite" target="_blank" rel="noopener">Dominik Bloechinger</a> · <a href="https://github.com/fiveworld-development/casino-suite/blob/main/LICENSE.md" target="_blank" rel="noopener" data-i18n="lobby.license">Lizenz</a></p>
+    </footer>
+  </main>
+
+  <script type="module">
+    import { register, applyI18n, langSwitch } from '/src/shared/i18n.js';
+    import { wallet, money } from '/src/shared/wallet.js';
+    register({
+      de: {
+        'lobby.refill': 'Auffüllen', 'lobby.title': 'Willkommen in der Lounge',
+        'lobby.sub': 'Vier Spiele, ein Guthaben. Ehrliche Zufallszahlen, geprüfte Auszahlungsquoten – und nur Spielgeld.',
+        'lobby.slots': 'Slots', 'lobby.tables': 'Tischspiele',
+        'lobby.khMeta': 'Tumble · Wachsende Walzen · 10.000x', 'lobby.hkMeta': 'Cluster · Hotbox bis x64 · 5.000x',
+        'lobby.bjMeta': '6 Decks · Blackjack zahlt 3:2', 'lobby.bjEdge': 'Hausvorteil ca. 0,4 %',
+        'lobby.pkMeta': '5 KI-Gegner · Kush or Better Video Poker',
+        'lobby.note': 'Nur Spielgeld – kein Echtgeld, keine Einzahlung, keine Auszahlung. 18+', 'lobby.license': 'Lizenz',
+      },
+      en: {
+        'lobby.refill': 'Refill', 'lobby.title': 'Welcome to the lounge',
+        'lobby.sub': 'Four games, one balance. Honest random numbers, verified payout rates – and play money only.',
+        'lobby.slots': 'Slots', 'lobby.tables': 'Table games',
+        'lobby.khMeta': 'Tumble · Growing reels · 10,000x', 'lobby.hkMeta': 'Cluster pays · Hotbox up to x64 · 5,000x',
+        'lobby.bjMeta': '6 decks · Blackjack pays 3:2', 'lobby.bjEdge': 'House edge ~0.4 %',
+        'lobby.pkMeta': '5 AI opponents · Kush or Better video poker',
+        'lobby.note': 'Play money only – no real money, no deposits, no withdrawals. 18+', 'lobby.license': 'License',
+      },
+    });
+    applyI18n();
+    document.getElementById('lang').appendChild(langSwitch());
+    wallet.on((b) => (document.getElementById('balance').textContent = money(b)));
+    document.getElementById('refill').onclick = () => wallet.refill();
+  </script>
+</body>
+</html>

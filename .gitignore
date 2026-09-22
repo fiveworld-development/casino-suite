@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.asset-originals/
+*.log
+vp_test_out.txt
+scripts/sim-rebalance.txt
+# design notes for games that are not built yet
+docs/02-pharaohs-eclipse.md
+docs/03-dragon-emperor.md
+.DS_Store
+Thumbs.db
+src/tables/kit/READY
