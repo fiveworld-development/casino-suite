@@ -24,12 +24,12 @@ Built with PixiJS · runs on desktop, tablet and phone (portrait and landscape) 
 
 ## The games
 
-| | Game | Highlights |
-|---|---|---|
-| <img src="public/assets/krakens-hoard/sym_wild.webp" width="56"> | **Kraken's Hoard** | Pirate tumble slot on a ship deck that breaks open from 4 to 8 rows (up to 262,144 ways). Kraken strikes turn whole reels wild with ×2–×10 multipliers, three free-spin "storms" to choose from, *Kraken's Wrath* (three wild reels at once), bonus buy. Max win 10,000×. |
-| <img src="public/assets/haze-kings/sym_wild.webp" width="56"> | **Haze Kings 420** | 7×7 cluster-pays tumble slot with a persistent Hotbox multiplier grid up to ×64, Munchies free spins, Cloud 9 super bonus, Lucky Lighter and bonus buys. Max win 5,000×. |
-| <img src="public/assets/tables/chip_100.webp" width="56"> | **Blackjack** | 6-deck shoe, dealer stands on all 17s, Blackjack pays 3:2, double after split, split up to 4 hands, insurance and even money. |
-| <img src="public/assets/poker/avatar_shark.webp" width="56"> | **Texas Hold'em** | No-limit table against 5 AI opponents with distinct styles, raise slider and presets, side pots, showdown highlights — plus **Kush or Better**, a 9/6 Jacks-or-Better video poker with an exact-EV hint. |
+| Game | Highlights |
+|---|---|
+| **Kraken's Hoard** | Pirate tumble slot on a ship deck that breaks open from 4 to 8 rows (up to 262,144 ways). Kraken strikes turn whole reels wild with ×2–×10 multipliers, three free-spin "storms" to choose from, *Kraken's Wrath* (three wild reels at once), bonus buy. Max win 10,000×. |
+| **Haze Kings 420** | 7×7 cluster-pays tumble slot with a persistent Hotbox multiplier grid up to ×64, Munchies free spins, Cloud 9 super bonus, Lucky Lighter and bonus buys. Max win 5,000×. |
+| **Blackjack** | 6-deck shoe, dealer stands on all 17s, Blackjack pays 3:2, double after split, split up to 4 hands, insurance and even money. |
+| **Texas Hold'em** | No-limit table against 5 AI opponents with distinct styles, raise slider and presets, side pots, showdown highlights — plus **Kush or Better**, a 9/6 Jacks-or-Better video poker with an exact-EV hint. |
 
 All games share one play-money wallet, a premium start screen, sound design with a synthesized fallback, procedural background music, and a DE / EN language switch.
 
