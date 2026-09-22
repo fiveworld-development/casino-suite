@@ -81,7 +81,7 @@ const R = {
   musicBonus: (s) => startMusic(s, 'trap', { vol: 0.5 }),
 };
 
-export const sfx = new Sound('/assets/haze-kings/sfx', Object.keys(R));
+export const sfx = new Sound(`${import.meta.env.BASE_URL}assets/haze-kings/sfx`, Object.keys(R), ['bigWin', 'coinLoop']); // real recordings in public/assets (see THIRD_PARTY.md)
 export const play = (name, opts) => sfx.play(name, R[name], opts);
 export const loop = (name, opts) => sfx.loop(name, R[name], opts);
 export const stopLoop = (name, fade) => sfx.stopLoop(name, fade);

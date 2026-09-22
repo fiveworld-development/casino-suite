@@ -19,8 +19,8 @@ import { payoutFor, solveBestHold } from './videopoker.js';
 import { sfx, play, loop } from './sfx.js';
 
 const $ = (id) => document.getElementById(id);
-const TBASE = '/assets/tables/';
-const PBASE = '/assets/poker/';
+const TBASE = `${import.meta.env.BASE_URL}assets/tables/`;
+const PBASE = `${import.meta.env.BASE_URL}assets/poker/`;
 const DEBUG = new URLSearchParams(location.search).has('debug');
 const cents = (v) => Math.round(v * 100) / 100;
 const cryptoRandom = () => crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296; // fair shuffles

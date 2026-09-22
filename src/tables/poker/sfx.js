@@ -20,6 +20,6 @@ const R = {
   music: (s) => startMusic(s, 'reggae', { vol: 0.26 }),
 };
 
-export const sfx = new Sound('/assets/poker/sfx', Object.keys(R));
+export const sfx = new Sound(`${import.meta.env.BASE_URL}assets/poker/sfx`, Object.keys(R), ['allin', 'big', 'card', 'chip', 'collect', 'flip', 'vpcard', 'win']); // real recordings in public/assets (see THIRD_PARTY.md)
 export const play = (name, opts) => sfx.play(name, R[name], opts);
 export const loop = (name, opts) => sfx.loop(name, R[name], opts);

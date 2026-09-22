@@ -14,8 +14,8 @@ import { chipBreakdown } from '../kit/chips.js';
 import { BlackjackGame, handValue, dealerShouldHit, resolveHand, resolveInsurance, canSplit, canDouble, splitHand, cents } from './engine.js';
 import { sfx, play, loop } from './sfx.js';
 
-const TBASE = '/assets/tables/';
-const BBASE = '/assets/blackjack/';
+const TBASE = `${import.meta.env.BASE_URL}assets/tables/`;
+const BBASE = `${import.meta.env.BASE_URL}assets/blackjack/`;
 const CHIPS = [1, 5, 25, 100, 420, 1000];
 const $ = (id) => document.getElementById(id);
 const DEBUG = new URLSearchParams(location.search).has('debug');
@@ -43,7 +43,7 @@ async function boot() {
   await Promise.all(['900 40px Montserrat', '800 20px Montserrat', '800 40px Cinzel'].map((f) => document.fonts.load(f).catch(() => {})));
   const IMAGES = {
     table_blackjack: `${BBASE}table_blackjack.webp`, bg_room: `${TBASE}bg_room.webp`, shoe: `${BBASE}shoe.webp`,
-    discard_tray: `${BBASE}discard_tray.webp`, dealer: `${BBASE}dealer.webp`, win_blackjack: '/assets/poker/win_blackjack.webp',
+    discard_tray: `${BBASE}discard_tray.webp`, dealer: `${BBASE}dealer.webp`, win_blackjack: `${import.meta.env.BASE_URL}assets/poker/win_blackjack.webp`,
     card_back: `${TBASE}card_back.webp`, court_J: `${TBASE}court_J.webp`, court_Q: `${TBASE}court_Q.webp`, court_K: `${TBASE}court_K.webp`,
     ...Object.fromEntries(CHIPS.map((c) => [`chip_${c}`, `${TBASE}chip_${c}.webp`])),
   };

@@ -12,7 +12,7 @@
 * { box-sizing: border-box; margin: 0; }
 [hidden] { display: none !important; }
 /* in-game phone: no lobby link (the host game handles navigation) */
-.embedded #bar a.icon[href="/"] { display: none; }
+.embedded #bar a.icon[href="./"] { display: none; }
 html, body { height: 100%; background: #03060c; color: var(--ink); font-family: Montserrat, Inter, system-ui, sans-serif; overflow: hidden; user-select: none; -webkit-tap-highlight-color: transparent; }
 button { font: inherit; color: inherit; cursor: pointer; border: 0; background: none; touch-action: manipulation; }
 html, body { -webkit-touch-callout: none; overscroll-behavior: none; height: 100dvh; }

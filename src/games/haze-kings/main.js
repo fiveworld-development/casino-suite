@@ -24,7 +24,7 @@ const CELL_W = GW / M.SIZE, CELL_H = GH / M.SIZE;
 const cx = (c) => GX + c * CELL_W + CELL_W / 2;
 const cy = (r) => GY + r * CELL_H + CELL_H / 2;
 const BB = GY + GH; // board bottom
-const BASE = '/assets/haze-kings/';
+const BASE = `${import.meta.env.BASE_URL}assets/haze-kings/`;
 const BETS = [0.2, 0.4, 0.6, 1, 2, 4, 5, 10, 20, 50, 100];
 // Lucky Lighter: measured with scripts/sim-haze-lighter.js – one boosted spin returns 3.09x bet on
 // average; the player also pays the normal bet for that spin, so 98 % needs 3.09 / 0.98 − 1 ≈ 2.15x.

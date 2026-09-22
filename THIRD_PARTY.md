@@ -30,6 +30,6 @@ All other sounds and the music are generated in code (`src/shared/sound.js`, `sr
 | `poker/sfx/allin.mp3` | freesound_community |
 | `*/sfx/coinLoop.mp3` and payout loops | floraphonic |
 | `*/sfx/win.mp3`, `big.mp3`, `bigWin.mp3`, `blackjack.mp3` win jingles | floraphonic, bithuh, puyopuyomegafan1234 |
-| `*/sfx/collect.mp3`, `chipland.mp3` coin sounds | yuliana-yurukova, floraphonic |
+| `poker/sfx/collect.mp3` coin sound | yuliana-yurukova |
 
 If you replace these files with your own, the rest of the audio keeps working (every sound has a synthesized fallback).

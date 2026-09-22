@@ -10,6 +10,8 @@
 A small casino you can drop into any website or game.<br>
 Two slots, Blackjack and Texas Hold'em. Play money only, in the browser, on any screen.
 
+### [Play it in your browser →](https://fiveworld-development.github.io/casino-suite/)
+
 <img src="docs/screenshots/krakens-hoard-anim.webp" alt="Kraken's Hoard in motion" width="860">
 
 </div>
@@ -26,11 +28,15 @@ Everything runs on play money. There is no deposit, no withdrawal and nothing to
 
 ### Kraken's Hoard
 
+[Play Kraken's Hoard](https://fiveworld-development.github.io/casino-suite/krakens-hoard.html)
+
 A pirate slot on the deck of a ship in a storm. Every winning tumble blasts a plank off the deck, and the deck stays open between spins, so the reels grow from 4 to 8 rows and from 4,096 to 262,144 ways to win. Fill the Kraken meter and a tentacle slams down on a reel, turning it wild with a multiplier. In the free spins you pick your own storm: lots of spins, a sticky Kraken reel from the start, or *Kraken's Wrath*, where three reels go wild at once.
 
 <img src="docs/screenshots/krakens-hoard-still.webp" alt="Kraken's Hoard" width="100%">
 
 ### Haze Kings 420
+
+[Play Haze Kings 420](https://fiveworld-development.github.io/casino-suite/haze-kings.html)
 
 A 7×7 cluster slot in a lounge floating above the clouds. Wins light up the cells underneath them, and every further hit on a lit cell doubles its multiplier, up to ×64. The *Hotbox* stays lit from spin to spin until a dead spin clears it, so a good streak really carries. The Cloud 9 bonus starts with the grid already glowing.
 
@@ -38,11 +44,15 @@ A 7×7 cluster slot in a lounge floating above the clouds. Wins light up the cel
 
 ### Blackjack
 
+[Play Blackjack](https://fiveworld-development.github.io/casino-suite/blackjack.html)
+
 Six decks, dealer stands on all 17s, Blackjack pays 3:2. You can double after splitting and split up to four hands, and you get insurance and even money when the dealer shows an ace. The table always shows your best total, never "7/17".
 
 <img src="docs/screenshots/blackjack.webp" alt="Blackjack" width="100%">
 
 ### Texas Hold'em and Kush or Better
+
+[Play Texas Hold'em and video poker](https://fiveworld-development.github.io/casino-suite/poker.html)
 
 A no-limit table against five AI players who each play differently. The Kingpin plays few hands but hits hard, Lucky Mary calls almost everything, Blaze bluffs far too often, Dr. Kush does the pot-odds maths, and the Couch Rookie is simply unpredictable. None of them can see your cards; the tests make sure of that. Next door is **Kush or Better**, a classic 9/6 Jacks or Better video poker with a hint button that works out the mathematically best hold.
 

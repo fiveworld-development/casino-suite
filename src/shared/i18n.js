@@ -119,6 +119,8 @@ if (typeof document !== 'undefined') {
     applyI18n();
     const loader = document.getElementById('loader');
     if (loader && !loader.querySelector('.lang-switch')) loader.appendChild(langSwitch());
+    // start-screen background: set from data-bg as an absolute URL (a relative url() in CSS would resolve against the stylesheet)
+    if (loader?.dataset.bg) loader.style.setProperty('--loader-bg', `url("${new URL(loader.dataset.bg, location.href).href}")`);
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once: true });
   else queueMicrotask(boot); // after the whole module graph ran, so every game dictionary is registered

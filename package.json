@@ -20,7 +20,8 @@
     "sim:kraken": "node scripts/sim-krakens-hoard.js",
     "sim:haze": "node scripts/sim-haze-kings.js",
     "sim:blackjack": "node scripts/sim-blackjack.js",
-    "optimize:assets": "node scripts/optimize-assets.js"
+    "optimize:assets": "node scripts/optimize-assets.js",
+    "deploy": "node scripts/deploy-pages.js"
   },
   "dependencies": {
     "pixi.js": "^8.6.0"

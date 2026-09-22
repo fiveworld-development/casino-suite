@@ -7,18 +7,38 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#04100b">
-  <title>Blackjack – Haze Kings Lounge</title>
+  <title>Free Blackjack Online – 6 Decks, Pays 3:2 | Casino Suite</title>
+  <!-- seo -->
+  <meta name="description" content="Play free Blackjack in your browser: 6-deck shoe, dealer stands on 17, Blackjack pays 3:2, split up to four hands, double after split, insurance. Play money, works on any phone.">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <meta name="author" content="Dominik Bloechinger">
+  <link rel="canonical" href="https://fiveworld-development.github.io/casino-suite/blackjack.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Casino Suite">
+  <meta property="og:title" content="Free Blackjack Online – 6 Decks, Pays 3:2 | Casino Suite">
+  <meta property="og:description" content="Play free Blackjack in your browser: 6-deck shoe, dealer stands on 17, Blackjack pays 3:2, split up to four hands, double after split, insurance. Play money, works on any phone.">
+  <meta property="og:url" content="https://fiveworld-development.github.io/casino-suite/blackjack.html">
+  <meta property="og:image" content="https://fiveworld-development.github.io/casino-suite/og-image.jpg">
+  <meta property="og:image:width" content="1280">
+  <meta property="og:image:height" content="640">
+  <meta property="og:image:alt" content="Casino Suite – Kraken's Hoard, Haze Kings 420, Blackjack and Texas Hold'em">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Free Blackjack Online – 6 Decks, Pays 3:2 | Casino Suite">
+  <meta name="twitter:description" content="Play free Blackjack in your browser: 6-deck shoe, dealer stands on 17, Blackjack pays 3:2, split up to four hands, double after split, insurance. Play money, works on any phone.">
+  <meta name="twitter:image" content="https://fiveworld-development.github.io/casino-suite/og-image.jpg">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoGame","name":"Blackjack","url":"https://fiveworld-development.github.io/casino-suite/blackjack.html","description":"Play free Blackjack in your browser: 6-deck shoe, dealer stands on 17, Blackjack pays 3:2, split up to four hands, double after split, insurance. Play money, works on any phone.","image":"https://fiveworld-development.github.io/casino-suite/og-image.jpg","genre":"Card game","gamePlatform":"Web browser","applicationCategory":"Game","operatingSystem":"Any","playMode":"SinglePlayer","inLanguage":["en","de"],"isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"author":{"@type":"Person","name":"Dominik Bloechinger","url":"https://github.com/fiveworld-development"},"codeRepository":"https://github.com/fiveworld-development/casino-suite"}</script>
+  <!-- /seo -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Cinzel:wght@800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/src/tables/lounge.css">
-  <link rel="stylesheet" href="/src/shared/loader.css">
+  <link rel="stylesheet" href="./src/tables/lounge.css">
+  <link rel="stylesheet" href="./src/shared/loader.css">
 </head>
 <body class="bj">
   <div id="stage"></div>
 
-  <div id="loader" style="--loader-bg:url('/assets/tables/bg_room.webp')">
-    <img src="/assets/blackjack/logo_blackjack.webp" alt="Blackjack" class="load-logo">
+  <div id="loader" data-bg="./assets/tables/bg_room.webp">
+    <img src="./assets/blackjack/logo_blackjack.webp" alt="Blackjack" class="load-logo">
     <div class="load-track"><div id="load-bar"></div></div>
     <div id="load-text" data-i18n="bj.loading">Der Tisch wird gedeckt…</div>
     <button id="load-start" class="cta" hidden data-i18n="load.play">Spielen</button>
@@ -26,10 +46,10 @@
   </div>
 
   <header class="topbar" id="topbar" hidden>
-    <a class="round-btn lobby-back" href="/" title="Lobby" data-i18n-aria="tb.toLobby" aria-label="Zur Lobby">
+    <a class="round-btn lobby-back" href="./" title="Lobby" data-i18n-aria="tb.toLobby" aria-label="Zur Lobby">
       <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>
     </a>
-    <img class="top-logo" src="/assets/blackjack/logo_blackjack.webp" alt="Blackjack">
+    <img class="top-logo" src="./assets/blackjack/logo_blackjack.webp" alt="Blackjack">
     <div class="stats">
       <div class="stat"><span class="lbl" data-i18n="tb.balance">Guthaben</span><b id="balance">0,00</b><button class="refill" id="refill" data-i18n-title="common.refill" title="Spielgeld auffüllen">+</button></div>
       <div class="stat"><span class="lbl" data-i18n="tb.bet">Einsatz</span><b id="bet-total">0,00</b></div>
@@ -95,6 +115,6 @@
     </div>
   </div>
 
-  <script type="module" src="/src/tables/blackjack/main.js"></script>
+  <script type="module" src="./src/tables/blackjack/main.js"></script>
 </body>
 </html>

@@ -4,13 +4,32 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#070b10">
-  <meta name="description" content="Casino Suite – premium play-money casino games for the web: two slots, Blackjack and Texas Hold'em. Built with PixiJS.">
-  <title>Casino Suite</title>
+  <title>Casino Suite – Free Online Casino Games: Slots, Blackjack & Poker (Play Money)</title>
+  <!-- seo -->
+  <meta name="description" content="Play free casino games in your browser: two feature-packed slots, Blackjack and Texas Hold'em against five AI players. Play money only, no download, works on phone and desktop.">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <meta name="author" content="Dominik Bloechinger">
+  <link rel="canonical" href="https://fiveworld-development.github.io/casino-suite/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Casino Suite">
+  <meta property="og:title" content="Casino Suite – Free Online Casino Games: Slots, Blackjack &amp; Poker (Play Money)">
+  <meta property="og:description" content="Play free casino games in your browser: two feature-packed slots, Blackjack and Texas Hold'em against five AI players. Play money only, no download, works on phone and desktop.">
+  <meta property="og:url" content="https://fiveworld-development.github.io/casino-suite/">
+  <meta property="og:image" content="https://fiveworld-development.github.io/casino-suite/og-image.jpg">
+  <meta property="og:image:width" content="1280">
+  <meta property="og:image:height" content="640">
+  <meta property="og:image:alt" content="Casino Suite – Kraken's Hoard, Haze Kings 420, Blackjack and Texas Hold'em">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Casino Suite – Free Online Casino Games: Slots, Blackjack &amp; Poker (Play Money)">
+  <meta name="twitter:description" content="Play free casino games in your browser: two feature-packed slots, Blackjack and Texas Hold'em against five AI players. Play money only, no download, works on phone and desktop.">
+  <meta name="twitter:image" content="https://fiveworld-development.github.io/casino-suite/og-image.jpg">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Casino Suite","url":"https://fiveworld-development.github.io/casino-suite/","description":"Free play-money casino games for the browser.","author":{"@type":"Person","name":"Dominik Bloechinger","url":"https://github.com/fiveworld-development"},"inLanguage":["en","de"],"hasPart":[{"@type":"VideoGame","name":"Kraken's Hoard","url":"https://fiveworld-development.github.io/casino-suite/krakens-hoard.html"},{"@type":"VideoGame","name":"Haze Kings 420","url":"https://fiveworld-development.github.io/casino-suite/haze-kings.html"},{"@type":"VideoGame","name":"Blackjack","url":"https://fiveworld-development.github.io/casino-suite/blackjack.html"},{"@type":"VideoGame","name":"Texas Hold'em & Kush or Better","url":"https://fiveworld-development.github.io/casino-suite/poker.html"}]}</script>
+  <!-- /seo -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/src/shared/loader.css">
-  <link rel="stylesheet" href="/src/lobby.css">
+  <link rel="stylesheet" href="./src/shared/loader.css">
+  <link rel="stylesheet" href="./src/lobby.css">
 </head>
 <body>
   <header class="top">
@@ -35,14 +54,14 @@
     <div class="block">
     <h2 data-i18n="lobby.slots">Slots</h2>
     <section class="grid">
-      <a class="card" href="/krakens-hoard.html" style="--glow:#39c6ff">
-        <img src="/assets/krakens-hoard/bg_main.webp" alt="" class="bg" loading="lazy">
-        <img src="/assets/krakens-hoard/logo.webp" alt="Kraken's Hoard" class="logo">
+      <a class="card" href="./krakens-hoard.html" style="--glow:#39c6ff">
+        <img src="./assets/krakens-hoard/bg_main.webp" alt="" class="bg" loading="lazy">
+        <img src="./assets/krakens-hoard/logo.webp" alt="Kraken's Hoard" class="logo">
         <div class="meta"><b>Kraken's Hoard</b><span data-i18n="lobby.khMeta">Tumble · Wachsende Walzen · 10.000x</span><em>RTP 98 %</em></div>
       </a>
-      <a class="card" href="/haze-kings.html" style="--glow:#4dff9a">
-        <img src="/assets/haze-kings/bg_main.webp" alt="" class="bg" loading="lazy">
-        <img src="/assets/haze-kings/logo.webp" alt="Haze Kings 420" class="logo">
+      <a class="card" href="./haze-kings.html" style="--glow:#4dff9a">
+        <img src="./assets/haze-kings/bg_main.webp" alt="" class="bg" loading="lazy">
+        <img src="./assets/haze-kings/logo.webp" alt="Haze Kings 420" class="logo">
         <div class="meta"><b>Haze Kings 420</b><span data-i18n="lobby.hkMeta">Cluster · Hotbox bis x64 · 5.000x</span><em>RTP 98 %</em></div>
       </a>
     </section>
@@ -50,14 +69,14 @@
     <div class="block">
     <h2 data-i18n="lobby.tables">Tischspiele</h2>
     <section class="grid">
-      <a class="card" href="/blackjack.html" style="--glow:#f2c350">
-        <img src="/assets/tables/bg_room.webp" alt="" class="bg" loading="lazy">
-        <img src="/assets/blackjack/logo_blackjack.webp" alt="Blackjack" class="logo">
+      <a class="card" href="./blackjack.html" style="--glow:#f2c350">
+        <img src="./assets/tables/bg_room.webp" alt="" class="bg" loading="lazy">
+        <img src="./assets/blackjack/logo_blackjack.webp" alt="Blackjack" class="logo">
         <div class="meta"><b>Blackjack</b><span data-i18n="lobby.bjMeta">6 Decks · Blackjack zahlt 3:2</span><em data-i18n="lobby.bjEdge">Hausvorteil ca. 0,4 %</em></div>
       </a>
-      <a class="card" href="/poker.html" style="--glow:#ff79b8">
-        <img src="/assets/tables/bg_room.webp" alt="" class="bg" loading="lazy">
-        <img src="/assets/poker/logo_poker.webp" alt="Texas Hold'em" class="logo">
+      <a class="card" href="./poker.html" style="--glow:#ff79b8">
+        <img src="./assets/tables/bg_room.webp" alt="" class="bg" loading="lazy">
+        <img src="./assets/poker/logo_poker.webp" alt="Texas Hold'em" class="logo">
         <div class="meta"><b>Texas Hold'em</b><span data-i18n="lobby.pkMeta">5 KI-Gegner · Kush or Better Video Poker</span><em>No-Limit</em></div>
       </a>
     </section>
@@ -71,8 +90,8 @@
   </main>
 
   <script type="module">
-    import { register, applyI18n, langSwitch } from '/src/shared/i18n.js';
-    import { wallet, money } from '/src/shared/wallet.js';
+    import { register, applyI18n, langSwitch } from './src/shared/i18n.js';
+    import { wallet, money } from './src/shared/wallet.js';
     register({
       de: {
         'lobby.refill': 'Auffüllen', 'lobby.title': 'Willkommen in der Lounge',

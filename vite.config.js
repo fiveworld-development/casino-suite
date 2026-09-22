@@ -1,7 +1,8 @@
-import { defineConfig } from 'vite';
+﻿import { defineConfig } from 'vite';
 import { resolve } from 'node:path';
 
 export default defineConfig({
+  base: './', // relative paths: works on GitHub Pages (/casino-suite/) and in any subfolder
   build: {
     rollupOptions: {
       input: {
@@ -14,3 +15,4 @@ export default defineConfig({
     },
   },
 });
+

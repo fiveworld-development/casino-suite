@@ -15,7 +15,7 @@ const GW = M.COLS * CELL, GH = M.MAX_ROWS * CELL;
 const GX = (W - GW) / 2, GY = 115;
 const cx = (c) => GX + c * CELL + CELL / 2;
 const cy = (r) => GY + r * CELL + CELL / 2;
-const BASE = '/assets/krakens-hoard/';
+const BASE = `${import.meta.env.BASE_URL}assets/krakens-hoard/`;
 const BETS = [0.2, 0.4, 0.6, 1, 2, 4, 5, 10, 20, 50, 100];
 // bonus buy, x bet: measured avg free-spin value 45.7x / 0.98 = 46.6x (scripts/sim-kraken-fs.js, 1M spins)
 const BUY_PRICE_X = 47;
@@ -26,7 +26,7 @@ const IMAGES = [
   ...M.PAYING.map((s) => `sym_${s}`), 'sym_wild', 'sym_scatter',
   'bg_main', 'bg_freespins', 'frame', 'frame_bottom', 'plank', 'logo', 'win_big', 'win_mega', 'win_epic',
 ];
-const OPTIONAL = ['kraken_tentacle', 'kraken_tentacle_sea', 'coin', 'multiplier_orb'];
+const OPTIONAL = ['kraken_tentacle', 'kraken_tentacle_sea']; // coin + orb are drawn procedurally (textures.js)
 
 // ---------------------------------------------------------------- state
 const S = {

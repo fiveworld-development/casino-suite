@@ -2,9 +2,11 @@
 // otherwise falls back to layered WebAudio synthesis so the game is never silent.
 
 export class Sound {
-  constructor(base, names) {
+  // files: names that exist as <base>/<name>.mp3 – only those are requested (no 404s for synth-only sounds)
+  constructor(base, names, files = names) {
     this.base = base;
     this.names = names;
+    this.available = new Set(files);
     this.files = new Map();
     this.muted = localStorage.getItem('arcade.muted') === '1';
     this.ctx = null;
@@ -25,7 +27,7 @@ export class Sound {
     this.noise = ctx.createBuffer(1, len, ctx.sampleRate);
     const d = this.noise.getChannelData(0);
     for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
-    await Promise.all(this.names.map(async (n) => {
+    await Promise.all(this.names.filter((n) => this.available.has(n)).map(async (n) => {
       try {
         const r = await fetch(`${this.base}/${n}.mp3`);
         if (!r.ok || !r.headers.get('content-type')?.includes('audio')) return;

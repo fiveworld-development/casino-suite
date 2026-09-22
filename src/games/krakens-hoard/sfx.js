@@ -89,7 +89,7 @@ const R = {
   music: () => null,
 };
 
-export const sfx = new Sound('/assets/krakens-hoard/sfx', Object.keys(R));
+export const sfx = new Sound(`${import.meta.env.BASE_URL}assets/krakens-hoard/sfx`, Object.keys(R), ['bigWin', 'coinLoop']); // real recordings in public/assets (see THIRD_PARTY.md)
 export const play = (name, opts) => sfx.play(name, R[name], opts);
 export const loop = (name, opts) => sfx.loop(name, R[name], opts);
 export const stopLoop = (name, fade) => sfx.stopLoop(name, fade);
