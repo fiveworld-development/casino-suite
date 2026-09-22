@@ -1,99 +1,147 @@
 <div align="center">
 
+<img src="public/assets/krakens-hoard/logo.webp" alt="Kraken's Hoard" height="96">&nbsp;
+<img src="public/assets/haze-kings/logo.webp" alt="Haze Kings 420" height="96">&nbsp;
+<img src="public/assets/blackjack/logo_blackjack.webp" alt="Blackjack" height="96">&nbsp;
+<img src="public/assets/poker/logo_poker.webp" alt="Texas Hold'em" height="96">
+
 # Casino Suite
 
-**Premium play-money casino games for the web: two slots, Blackjack and Texas Hold'em.**
-Built with PixiJS · runs on desktop, tablet and phone (portrait and landscape) · German & English
+A small casino you can drop into any website or game.<br>
+Two slots, Blackjack and Texas Hold'em. Play money only, in the browser, on any screen.
 
-<br>
-
-<img src="public/assets/krakens-hoard/logo.webp" alt="Kraken's Hoard" height="120">&nbsp;&nbsp;
-<img src="public/assets/haze-kings/logo.webp" alt="Haze Kings 420" height="120">&nbsp;&nbsp;
-<img src="public/assets/blackjack/logo_blackjack.webp" alt="Blackjack" height="120">&nbsp;&nbsp;
-<img src="public/assets/poker/logo_poker.webp" alt="Texas Hold'em" height="120">
-
-<br>
-
-![License: Non-commercial free / commercial paid](https://img.shields.io/badge/license-free%20non--commercial%20%C2%B7%20paid%20commercial-f2c350)
-![PixiJS 8](https://img.shields.io/badge/PixiJS-8-e91e63)
-![Play money only](https://img.shields.io/badge/play%20money-only-4dff9a)
+<img src="docs/screenshots/krakens-hoard-anim.webp" alt="Kraken's Hoard in motion" width="860">
 
 </div>
 
----
+<br>
+
+I started this because I needed a casino for the in-game phone of another project, and everything I found was either a dated HTML5 template or a slot that looked nice but paid out whatever it felt like. So I built my own. Four games, each with real maths behind it, tuned until they felt good to play on a laptop and on a phone held sideways under the table.
+
+Everything runs on play money. There is no deposit, no withdrawal and nothing to win except the fun of watching the Kraken wreck your reels.
+
+<br>
 
 ## The games
 
-| Game | Highlights |
-|---|---|
-| **Kraken's Hoard** | Pirate tumble slot on a ship deck that breaks open from 4 to 8 rows (up to 262,144 ways). Kraken strikes turn whole reels wild with ×2–×10 multipliers, three free-spin "storms" to choose from, *Kraken's Wrath* (three wild reels at once), bonus buy. Max win 10,000×. |
-| **Haze Kings 420** | 7×7 cluster-pays tumble slot with a persistent Hotbox multiplier grid up to ×64, Munchies free spins, Cloud 9 super bonus, Lucky Lighter and bonus buys. Max win 5,000×. |
-| **Blackjack** | 6-deck shoe, dealer stands on all 17s, Blackjack pays 3:2, double after split, split up to 4 hands, insurance and even money. |
-| **Texas Hold'em** | No-limit table against 5 AI opponents with distinct styles, raise slider and presets, side pots, showdown highlights — plus **Kush or Better**, a 9/6 Jacks-or-Better video poker with an exact-EV hint. |
+### Kraken's Hoard
 
-All games share one play-money wallet, a premium start screen, sound design with a synthesized fallback, procedural background music, and a DE / EN language switch.
+A pirate slot on the deck of a ship in a storm. Every winning tumble blasts a plank off the deck, and the deck stays open between spins, so the reels grow from 4 to 8 rows and from 4,096 to 262,144 ways to win. Fill the Kraken meter and a tentacle slams down on a reel, turning it wild with a multiplier. In the free spins you pick your own storm: lots of spins, a sticky Kraken reel from the start, or *Kraken's Wrath*, where three reels go wild at once.
 
-## Honest by design
+<img src="docs/screenshots/krakens-hoard-still.webp" alt="Kraken's Hoard" width="100%">
 
-- **Fair randomness.** Card shoes and poker decks are shuffled with `crypto.getRandomValues`. The poker AI never sees your hole cards (covered by tests).
-- **Measured payout rates.** The slot maths are pure, step-based modules; the renderers only play the steps back. Monte-Carlo simulations in [`scripts/`](scripts) verify them:
-  - Kraken's Hoard ≈ 98 % RTP (1M spins per free-spin storm)
-  - Haze Kings 420 ≈ 98.1 % RTP (4M spins; high volatility, ±1.5 % at that sample size)
-  - Blackjack house edge ≈ 0.4 % with basic strategy (1M-hand simulation)
-  - Kush or Better uses the standard 9/6 paytable (99.54 % with perfect play)
-- **No rigged near-misses and no losses disguised as wins.** Every payout is rounded to cents and each game keeps an audit ledger (`?debug`).
+### Haze Kings 420
 
-These numbers come from simulation, not from a certification lab — see the gambling clause in the [license](LICENSE.md).
+A 7×7 cluster slot in a lounge floating above the clouds. Wins light up the cells underneath them, and every further hit on a lit cell doubles its multiplier, up to ×64. The *Hotbox* stays lit from spin to spin until a dead spin clears it, so a good streak really carries. The Cloud 9 bonus starts with the grid already glowing.
 
-## Quick start
+<div align="center"><img src="docs/screenshots/haze-kings-anim.webp" alt="Haze Kings 420 – Cloud 9 bonus" width="860"></div>
+
+### Blackjack
+
+Six decks, dealer stands on all 17s, Blackjack pays 3:2. You can double after splitting and split up to four hands, and you get insurance and even money when the dealer shows an ace. The table always shows your best total, never "7/17".
+
+<img src="docs/screenshots/blackjack.webp" alt="Blackjack" width="100%">
+
+### Texas Hold'em and Kush or Better
+
+A no-limit table against five AI players who each play differently. The Kingpin plays few hands but hits hard, Lucky Mary calls almost everything, Blaze bluffs far too often, Dr. Kush does the pot-odds maths, and the Couch Rookie is simply unpredictable. None of them can see your cards; the tests make sure of that. Next door is **Kush or Better**, a classic 9/6 Jacks or Better video poker with a hint button that works out the mathematically best hold.
+
+<img src="docs/screenshots/poker.webp" alt="Texas Hold'em" width="100%">
+
+<img src="docs/screenshots/video-poker.webp" alt="Kush or Better video poker" width="100%">
+
+<br>
+
+## On a phone
+
+Every game has its own layout for phones in portrait and landscape, tablets and desktops. I didn't want one layout squeezed to fit.
+
+<img src="docs/screenshots/phones.webp" alt="Blackjack, Hold'em and Kraken's Hoard on a phone" width="100%">
+
+<br>
+
+## Fair numbers
+
+I care about this part, so here is exactly what I checked.
+
+The slots are split into a pure maths module and a renderer that only plays back what the maths decided. That makes them easy to simulate, and the scripts in [`scripts/`](scripts) do exactly that:
+
+| Game | Result | Sample |
+|---|---|---|
+| Kraken's Hoard | about 98 % RTP | 1 million spins per free-spin storm |
+| Haze Kings 420 | 98.1 % RTP (± 1.5 %) | 4 million spins |
+| Blackjack | about 0.4 % house edge with basic strategy | 1 million hands |
+| Kush or Better | 99.54 % with perfect play | standard 9/6 paytable |
+
+Cards are shuffled with the browser's cryptographic random generator. There are no fake near-misses and no losses dressed up as wins. Every game keeps a ledger you can check with `?debug`.
+
+These are simulation results, not a lab certificate. If you ever want to use the games with real money, read the gambling section of the [license](LICENSE.md) first.
+
+<br>
+
+## Try it
 
 ```bash
+git clone https://github.com/fiveworld-development/casino-suite.git
+cd casino-suite
 npm install
-npm run dev          # http://localhost:5190
-npm run build        # static files in dist/
-npm test             # engine, evaluator, hold'em and AI tests
-npm run sim:kraken   # RTP simulations (also sim:haze, sim:blackjack)
+npm run dev
 ```
 
-## Embedding
+Then open http://localhost:5190. `npm run build` gives you a static folder you can host anywhere, and `npm test` runs the engine tests.
 
-Every game is a standalone page (`krakens-hoard.html`, `haze-kings.html`, `blackjack.html`, `poker.html`) and can be embedded in an `<iframe>`:
+### Putting it into your own project
 
-| Parameter | Effect |
+Each game is a normal page (`krakens-hoard.html`, `haze-kings.html`, `blackjack.html`, `poker.html`) that also works inside an `<iframe>`.
+
+| Add to the URL | What it does |
 |---|---|
-| `?embed=1` | Embedded mode: no fullscreen request, no lobby button (also detected automatically inside an iframe) |
-| `?lang=de` / `?lang=en` | Language (otherwise: saved choice, then browser language) |
-| `?debug` | Exposes a test driver (`KH`, `HK`, `BJ`, `PK`) and the audit ledger in the console |
+| `?embed=1` | Hides the lobby button and skips fullscreen. Also switches on automatically inside an iframe. |
+| `?lang=en` or `?lang=de` | Picks the language. Without it the game uses the last choice or the browser language. |
+| `?debug` | Adds a test driver and the payout ledger to the console. |
 
-The balance lives in `localStorage` (`arcade.balance`) and is shared by all games on the same origin.
+All games share one balance through `localStorage`, so winnings in the slots can be lost again at the poker table, just like in a real casino.
 
-## Tech
+<details>
+<summary><b>How it's built</b></summary>
 
-Vite · PixiJS 8 · plain ES modules, no framework. Canvas-rendered text with a dark plaque behind every result message for legibility on any background. Card faces are drawn lazily, oversized artwork is pre-scaled (`npm run optimize:assets`), and blurred backgrounds are baked once instead of filtered every frame, so the games stay light on phones.
+<br>
+
+Vite and PixiJS 8, plain JavaScript modules, no framework.
 
 ```
-src/games/krakens-hoard   slot: math.js (pure) + main.js (renderer)
-src/games/haze-kings      slot: math.js (pure) + main.js (renderer)
-src/tables/blackjack      engine.js (pure, tested) + main.js
-src/tables/poker          evaluator / holdem / ai / videopoker (pure, tested) + main.js
-src/tables/kit            cards, chips, crypto shuffle, embed helpers
-src/shared                wallet, i18n, motion, sound, music, start screen
+src/games/krakens-hoard   slot maths (math.js) and renderer (main.js)
+src/games/haze-kings      slot maths (math.js) and renderer (main.js)
+src/tables/blackjack      rules engine with tests, table renderer
+src/tables/poker          hand evaluator, Hold'em engine, AI, video poker solver
+src/tables/kit            cards, chips, shuffling, embed helpers
+src/shared                wallet, translations, animation, sound, music, start screen
 ```
+
+A few things that keep it light on phones: card faces are only drawn when a card is first shown, artwork is scaled to the largest size it is ever displayed at (`npm run optimize:assets`), and the blurred room behind the tables is computed once instead of every frame. The screenshots and animations in this README are made by `scripts/screenshots.js` and `scripts/record.js`.
+
+</details>
+
+<br>
 
 ## License
 
-**Free for non-commercial use** — personal projects, learning, game jams, portfolios, schools and non-profits — as long as you show a visible credit with a link:
+**Free for anything non-commercial.** Personal projects, learning, game jams, your portfolio, schools, clubs and non-profits can all use it for free. The only thing I ask is a visible credit with a link, somewhere players can actually see it:
 
 > Games by **Dominik Bloechinger** – [Casino Suite](https://github.com/fiveworld-development/casino-suite)
 
-**Commercial use needs a paid license** — one-time per product, no royalties. Indie from € 290, Studio € 1,490, Enterprise / white-label on request. Real-money or crypto gambling only with an explicit Operator license.
+**Making money with it?** Then you need a commercial license. It's a one-time fee per product with no royalties: € 290 for indies, € 1,490 for studios, and an individual offer for bigger companies and white-label use. If you're not sure whether your project counts as commercial, just ask. Real-money gambling is only possible with a separate operator agreement.
 
-→ Full terms: [LICENSE.md](LICENSE.md) · Pricing & how to buy: [COMMERCIAL.md](COMMERCIAL.md) · Third-party material: [THIRD_PARTY.md](THIRD_PARTY.md)
+[Full license](LICENSE.md) · [Commercial licenses](COMMERCIAL.md) · [Sounds, fonts and libraries](THIRD_PARTY.md)
 
-## Responsible play
+<br>
 
-This project contains **no real-money gambling**: no deposits, no withdrawals, no prizes. It is intended for adults (18+). If gambling is a problem for you or someone close to you, help is available — e.g. [BZgA check-dein-spiel.de](https://www.check-dein-spiel.de) (DE) or [BeGambleAware](https://www.begambleaware.org) (UK).
+## Play responsibly
 
----
+These games are made for adults and use play money only. If gambling stops being fun for you or someone close to you, help is out there: [check-dein-spiel.de](https://www.check-dein-spiel.de) in Germany or [BeGambleAware](https://www.begambleaware.org) in the UK.
 
-<div align="center">Made by <b>Dominik Bloechinger</b> · © 2026</div>
+<br>
+
+<div align="center">
+<sub>Made by Dominik Bloechinger · 2026</sub>
+</div>
