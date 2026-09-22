@@ -3,6 +3,7 @@ import { register, applyI18n } from '../../shared/i18n.js';
 
 register({
   de: {
+    'kh.pt.voyage': '<b>DIE REISE</b> – jede gesprengte Planke, jeder Kompass und jeder Kraken-Angriff bringt Seemeilen. Fünf Inseln: Schatzinsel, Schmugglerbucht, Geisterschiff, Sirenenriff, Kraken-Höhle. Jede Insel zahlt ihren eigenen Bonus: Truhen-Auswahl oder Sonder-Freispiele. Nach der Kraken-Höhle beginnt eine neue Reise. Boni zahlen auf den Durchschnittseinsatz der Etappe – später den Einsatz hochdrehen bringt nichts.',
     // the voyage
     'kh.island.treasure': 'Schatzinsel',
     'kh.island.smugglers': 'Schmugglerbucht',
@@ -16,6 +17,8 @@ register({
     'kh.islandStory.lair': 'Kapitel 5 · Das Wasser kocht. Der Kraken wartet auf dich – und auf seinen Schatz.',
     'kh.voyageDone': 'REISE {n} GESCHAFFT',
     'kh.voyageNext': 'Der Kraken versinkt. Eine neue Karte, eine neue Reise.',
+    'kh.course': 'Kurs: {name}',
+    'kh.milesOf': '{a} von {b} Meilen',
     'kh.chestTitle': 'WÄHLE DEINE TRUHEN',
     'kh.chestPicks': 'Noch {n} Truhen öffnen',
     'kh.loading': 'Lade Schätze…',
@@ -71,6 +74,7 @@ register({
     'kh.pt.r8': 'Nur Spielgeld – kein Echtgeld, keine Auszahlung.',
   },
   en: {
+    'kh.pt.voyage': "<b>THE VOYAGE</b> – every blasted plank, every compass and every Kraken strike earns nautical miles. Five islands: Treasure Island, Smugglers' Cove, Ghost Ship, Siren Reef and the Kraken's Lair. Each island pays its own bonus: a treasure pick or special free spins. After the lair a new voyage begins. Bonuses pay on the average bet of that leg, so raising your bet late gains nothing.",
     // the voyage
     'kh.island.treasure': 'Treasure Island',
     'kh.island.smugglers': "Smugglers' Cove",
@@ -84,6 +88,8 @@ register({
     'kh.islandStory.lair': 'Chapter 5 · The water boils. The Kraken is waiting for you – and for its hoard.',
     'kh.voyageDone': 'VOYAGE {n} COMPLETE',
     'kh.voyageNext': 'The Kraken sinks away. A new chart, a new voyage.',
+    'kh.course': 'Course: {name}',
+    'kh.milesOf': '{a} of {b} miles',
     'kh.chestTitle': 'PICK YOUR CHESTS',
     'kh.chestPicks': '{n} chests left to open',
     'kh.loading': 'Loading treasure…',

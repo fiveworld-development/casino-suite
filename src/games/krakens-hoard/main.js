@@ -142,7 +142,7 @@ async function start() {
   layout();
   app.ticker.add(tick);
   loop('ocean');
-  loop('music'); // silent unless sfx/music.mp3 exists
+  loop('music'); // procedural sea shanty (or sfx/music.mp3 when present)
 
   if (new URLSearchParams(location.search).has('debug')) window.KH = {
     // ledger audit: balance must equal start − Σbets + Σwins
@@ -357,7 +357,7 @@ function buildHud() {
 
   // Kraken meter: every blasted plank charges it, full = guaranteed Kraken strike
   const meter = new Container();
-  const ml = new GoldText(420, 56, 26, { palette: 'white', glow: 'rgba(190,90,255,.8)', stroke: '#14031c' });
+  const ml = new GoldText(520, 60, 30, { palette: 'white', glow: 'rgba(190,90,255,.8)', stroke: '#14031c' });
   ml.text = L('kh.krakenStrike');
   ml.y = -44;
   const W2 = 330, H2 = 30;
@@ -369,9 +369,11 @@ function buildHud() {
   eye.tint = 0xd070ff;
   eye.blendMode = 'add';
   eye.x = W2 / 2 + 14;
-  const count = new GoldText(260, 44, 20, { palette: 'white', glow: 'rgba(0,0,0,.9)', stroke: '#14031c' });
+  const count = new GoldText(360, 46, 24, { palette: 'white', glow: 'rgba(0,0,0,.9)', stroke: '#14031c' });
   count.y = 1;
-  meter.addChild(ml, track, fill, eye, count);
+  // dark glass panel behind label + bar: readable over the stormy sea in every situation
+  const mpanel = new Graphics().roundRect(-215, -74, 430, 118, 20).fill({ color: 0x0a0414, alpha: 0.72 }).stroke({ width: 2, color: 0xc9a14a, alpha: 0.5 });
+  meter.addChild(mpanel, ml, track, fill, eye, count);
   Object.assign(meter, { fillG: fill, eye, count, lbl: ml, W: W2, H: H2, shown: -1 });
   hud.addChild(meter);
   hud.meter = meter;
@@ -379,7 +381,7 @@ function buildHud() {
 
   // The voyage: nautical miles towards the next island on the chart
   const voy = new Container();
-  const vl = new GoldText(460, 56, 26, { palette: 'white', glow: 'rgba(120,200,255,.8)', stroke: '#04121c' });
+  const vl = new GoldText(520, 60, 30, { palette: 'white', glow: 'rgba(120,200,255,.8)', stroke: '#04121c' });
   vl.y = -44;
   const VW = 330, VH = 18;
   const vtrack = new Graphics().roundRect(-VW / 2, -VH / 2, VW, VH, VH / 2).fill({ color: 0x061422, alpha: 0.85 }).stroke({ width: 3, color: 0xc9a14a });
@@ -391,9 +393,10 @@ function buildHud() {
     d.y = VH / 2 + 16;
     dots.addChild(d);
   }
-  const vcount = new GoldText(300, 40, 19, { palette: 'white', glow: 'rgba(0,0,0,.9)', stroke: '#04121c' });
+  const vcount = new GoldText(420, 44, 23, { palette: 'white', glow: 'rgba(0,0,0,.9)', stroke: '#04121c' });
   vcount.y = 0;
-  voy.addChild(vl, vtrack, vfill, dots, vcount);
+  const vpanel = new Graphics().roundRect(-215, -74, 430, 128, 20).fill({ color: 0x04101c, alpha: 0.72 }).stroke({ width: 2, color: 0x5ba9e0, alpha: 0.5 });
+  voy.addChild(vpanel, vl, vtrack, vfill, dots, vcount);
   Object.assign(voy, { fillG: vfill, lbl: vl, count: vcount, dots, W: VW, H: VH });
   hud.addChild(voy);
   hud.voyage = voy;
@@ -406,8 +409,8 @@ function drawVoyage(pop = true) {
   if (!v) return;
   const need = M.islandMiles(S.voyage.island);
   const k = Math.min(S.voyage.miles / need, 1);
-  v.lbl.text = L(`kh.island.${M.ISLANDS[S.voyage.island].key}`).toUpperCase();
-  v.count.text = `${Math.floor(S.voyage.miles)} / ${need} sm`;
+  v.lbl.text = L('kh.course', { name: L(`kh.island.${M.ISLANDS[S.voyage.island].key}`) }).toUpperCase();
+  v.count.text = L('kh.milesOf', { a: Math.floor(S.voyage.miles), b: need });
   v.fillG.clear();
   if (k > 0) {
     const w = Math.max(v.H, v.W * k);
@@ -475,7 +478,7 @@ const LAYOUTS = {
       logo: [L, bt + 60, 285], hudScale: 0.7,
       waysLbl: [R, bt + 10], ways: [R, bt + 68], maxLbl: [R, bt + 124],
       tumbleLbl: [R, bt + 230], tumble: [R, bt + 288], fs: [L, bt + 370],
-      meter: [R, bt + 420], voyage: [R, bt + 560],
+      meter: [R - 70, bt + 420], voyage: [R - 70, bt + 560],
     };
   },
   portrait: (bt) => {
@@ -493,6 +496,7 @@ const LAYOUTS = {
 };
 
 let portrait = false;
+let hudSRef = 0, hudComp = 1;
 function applyHudLayout(L) {
   portrait = !!L.portrait;
   hud.logo.scale.set(L.logo[2] / hud.logo.texture.width);
@@ -500,17 +504,20 @@ function applyHudLayout(L) {
   hud.logo.baseY = L.logo[1];
   for (const k of ['waysLbl', 'ways', 'maxLbl', 'tumbleLbl', 'tumble', 'fs', 'meter', 'voyage']) {
     hud[k].position.set(...L[k]);
-    hud[k].base = L.hudScale;
-    if (!motion.tweens || ![...motion.tweens].some((t) => t.obj === hud[k])) hud[k].scale.set(L.hudScale);
+    hud[k].base = L.hudScale * hudComp;
+    if (!motion.tweens || ![...motion.tweens].some((t) => t.obj === hud[k])) hud[k].scale.set(hud[k].base);
   }
 }
 
 function layout() {
   const sw = app.screen.width, sh = app.screen.height;
   const L = (sw / sh < 0.95 ? LAYOUTS.portrait : LAYOUTS.landscape)(boardTop());
-  applyHudLayout(L);
   const b = L.bounds;
   const s = Math.min(sw / b.w, sh / b.h);
+  // a bigger deck zooms the camera out – the HUD must NOT shrink with it, so it is scaled back up
+  if (S.rows <= M.MIN_ROWS || !hudSRef) hudSRef = s;
+  hudComp = Math.min(1.8, Math.max(1, hudSRef / s));
+  applyHudLayout(L);
   world.scale.set(s);
   world.position.set((sw - b.w * s) / 2 - b.x * s, (sh - b.h * s) / 2 - b.y * s);
   world.base = { x: world.x, y: world.y };
@@ -1361,8 +1368,10 @@ async function freeSpinsRound(setup, label, betOverride) {
   clearBadges();
   krakenRises();
   await banner(L('kh.fsBanner', { n: setup.spins }), label, 'fsStart');
+  stopLoop('music', 1.2);
   stopLoop('ocean');
   loop('storm');
+  loop('musicStorm');
   motion.tween(bgFree, { alpha: 1 }, 1500);
   lightningAt = performance.now() + 800;
   drawMeter(S.fs.meter, false);
@@ -1401,7 +1410,9 @@ async function freeSpinsRound(setup, label, betOverride) {
   krakenSinks();
   clearBadges();
   stopLoop('storm');
+  stopLoop('musicStorm', 1.2);
   loop('ocean');
+  loop('music');
   motion.tween(bgFree, { alpha: 0 }, 1500);
   motion.tween(hud.fs, { alpha: 0 }, 500);
   hideTumble();

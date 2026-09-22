@@ -28,7 +28,7 @@ const BASE = `${import.meta.env.BASE_URL}assets/haze-kings/`;
 const BETS = [0.2, 0.4, 0.6, 1, 2, 4, 5, 10, 20, 50, 100];
 // Lucky Lighter: measured with scripts/sim-haze-lighter.js – one boosted spin returns 3.09x bet on
 // average; the player also pays the normal bet for that spin, so 98 % needs 3.09 / 0.98 − 1 ≈ 2.15x.
-const LIGHTER_PRICE = 2.15;
+const LIGHTER_PRICE = 1.27; // measured: the lighter returns ~1.25x on average (scripts/sim-haze-lighter.js)
 const TIERS = [['big', 15], ['mega', 30], ['epic', 50], ['legendary', 200]];
 const HOTBOX_COLOR = (v) => (v >= 64 ? 0xffffff : v >= 16 ? 0xb24bff : v >= 8 ? 0xffd23c : 0x7dff5a); // green → gold → purple → white (max x64)
 
@@ -42,6 +42,7 @@ const IMAGES = [
 // ---------------------------------------------------------------- state
 const S = {
   bet: Number(localStorage.getItem('hk.bet')) || 1,
+  grow: readGrow(),
   busy: false,
   turbo: localStorage.getItem('hk.turbo') === '1',
   auto: 0,
@@ -53,6 +54,15 @@ const S = {
   luckyLighter: 0, // remaining spins with doubled scatter chance (bought)
 };
 if (!BETS.includes(S.bet)) S.bet = 1;
+
+// the grow survives page reloads – it is the long-term progression of this machine
+function readGrow() {
+  try {
+    const g = JSON.parse(localStorage.getItem('hk.grow'));
+    if (g && Number.isFinite(g.leaves) && g.stage >= 0 && g.stage < M.STAGES.length) return { ...M.initialGrow(), ...g };
+  } catch { /* corrupted or first run */ }
+  return M.initialGrow();
+}
 
 const cents = (v) => Math.round(v * 100) / 100;
 const $ = (id) => document.getElementById(id);
@@ -218,6 +228,54 @@ function buildHud() {
   fs.addChild(fsl, fsc);
   hud.addChild(fs);
   Object.assign(hud, { fs, fsCount: fsc });
+
+  // THE GROW: every cluster feeds the plant; each stage pays its own bonus
+  const grow = new Container();
+  const panel = new Graphics().roundRect(-186, -74, 372, 124, 18).fill({ color: 0x06180e, alpha: 0.74 }).stroke({ width: 2, color: 0x7dff5a, alpha: 0.45 });
+  const gl = new GoldText(460, 58, 27, { palette: 'white', glow: 'rgba(125,255,90,.8)', stroke: '#031a0c' });
+  gl.y = -46;
+  const GW2 = 292, GH2 = 17;
+  const gtrack = new Graphics().roundRect(-GW2 / 2, -GH2 / 2, GW2, GH2, GH2 / 2).fill({ color: 0x07200f, alpha: 0.9 }).stroke({ width: 3, color: 0x2f6e50 });
+  const gfill = new Graphics();
+  const leaves = new Container();
+  for (let i = 0; i < M.STAGES.length; i++) {
+    const d = new Graphics();
+    d.x = -GW2 / 2 + (GW2 / (M.STAGES.length - 1)) * i;
+    d.y = GH2 / 2 + 16;
+    leaves.addChild(d);
+  }
+  const gcount = new GoldText(380, 42, 21, { palette: 'white', glow: 'rgba(0,0,0,.9)', stroke: '#031a0c' });
+  grow.addChild(panel, gl, gtrack, gfill, leaves, gcount);
+  Object.assign(grow, { fillG: gfill, lbl: gl, count: gcount, dots: leaves, W: GW2, H: GH2 });
+  hud.addChild(grow);
+  hud.grow = grow;
+  drawGrow(false);
+}
+
+/** Plant meter: progress to the next stage plus a dot per stage of this plant. */
+function drawGrow(pop = true) {
+  const g = hud.grow;
+  if (!g) return;
+  const need = M.stageLeaves(S.grow.stage);
+  const k = Math.min(S.grow.leaves / need, 1);
+  g.lbl.text = t('hk.growing', { name: t(`hk.stage.${M.STAGES[S.grow.stage].key}`) }).toUpperCase();
+  g.count.text = t('hk.leavesOf', { a: Math.floor(S.grow.leaves), b: need });
+  g.fillG.clear();
+  if (k > 0) {
+    const w = Math.max(g.H, g.W * k);
+    g.fillG.roundRect(-g.W / 2 + 3, -g.H / 2 + 3, w - 6, g.H - 6, (g.H - 6) / 2).fill({ color: 0x7dff5a });
+    g.fillG.roundRect(-g.W / 2 + 6, -g.H / 2 + 5, w - 12, (g.H - 6) / 3, 3).fill({ color: 0xffffff, alpha: 0.3 });
+  }
+  g.dots.children.forEach((d, i) => {
+    const done = i < S.grow.stage;
+    d.clear().circle(0, 0, done || i === S.grow.stage ? 7 : 5)
+      .fill({ color: done ? 0xf5c542 : i === S.grow.stage ? 0x7dff5a : 0x24452f })
+      .stroke({ width: 2, color: done ? 0xfff3c4 : 0x071b10 });
+  });
+  if (pop) {
+    g.count.scale.set(1.3);
+    motion.tween(g.count, { scale: 1 }, 400, ease.outElastic);
+  }
 }
 
 const BB_ = () => BB;
@@ -232,18 +290,20 @@ const LAYOUTS = {
       bounds: { x: left - col, y: top, w: right - left + col * 2, h: bottom - top },
       logo: [left - col / 2, top + 150, 340], maxLbl: [right + col / 2, top + 60],
       tumbleLbl: [right + col / 2, top + 170], tumble: [right + col / 2, top + 235], fs: [left - col / 2, top + 420],
+      grow: [right + col / 2, top + 420],
       hudScale: 1, portrait: false,
     };
   },
   portrait: () => ({
-    bounds: { x: GX - 60, y: frameY - 190, w: GW + 120, h: (frameY + frameW) + 320 - (frameY - 190) },
+    bounds: { x: GX - 60, y: frameY - 190, w: GW + 120, h: (frameY + frameW) + 400 - (frameY - 190) },
     logo: [GX + GW / 2, frameY - 110, 300], maxLbl: [GX + GW / 2, frameY + frameW + 60],
     tumbleLbl: [GX + GW / 2, frameY + frameW + 140], tumble: [GX + GW / 2, frameY + frameW + 195],
-    fs: [GX + GW / 2, frameY - 110], hudScale: 1, portrait: true,
+    fs: [GX + GW / 2, frameY - 110], grow: [GX + GW / 2, frameY + frameW + 265], hudScale: 1, portrait: true,
   }),
 };
 
 let portrait = false;
+let hudSRef = 0, hudComp = 1; // the HUD keeps its on-screen size no matter how the world is scaled
 function applyHudLayout(L) {
   portrait = L.portrait;
   hud.logo.scale.set(L.logo[2] / hud.logo.texture.width);
@@ -254,14 +314,18 @@ function applyHudLayout(L) {
   hud.tumble.position.set(...L.tumble);
   hud.fs.position.set(...L.fs);
   hud.fs.visible = !(portrait && !S.fs) || !!S.fs;
+  hud.grow.position.set(...L.grow);
+  hud.grow.scale.set(hudComp);
 }
 
 function layout() {
   const sw = app.screen.width, sh = app.screen.height;
   const L = (sw / sh < 0.95 ? LAYOUTS.portrait : LAYOUTS.landscape)();
-  applyHudLayout(L);
   const b = L.bounds;
   const s = Math.min(sw / b.w, sh / b.h);
+  if (!hudSRef) hudSRef = s;
+  hudComp = Math.min(1.6, Math.max(1, hudSRef / s));
+  applyHudLayout(L);
   world.scale.set(s);
   world.position.set((sw - b.w * s) / 2 - b.x * s, (sh - b.h * s) / 2 - b.y * s);
   world.base = { x: world.x, y: world.y };
@@ -646,6 +710,7 @@ async function spinOnce() {
   try {
     if (win > 0) { await presentWin(res.x, win); await creditWin(win); credited = true; }
     if (res.award) fsWin = await freeSpins(res.award, res.cloud9);
+    fsWin += await growOn(res, bet);
   } catch (err) {
     console.error('[haze-kings] post-spin presentation failed, crediting anyway', err);
     if (win > 0 && !credited) wallet.add(win);
@@ -663,12 +728,127 @@ async function spinOnce() {
   }
 }
 
-async function freeSpins(award, cloud9) {
-  S.fs = { left: award, played: 0, total: 0, hotbox: cloud9 ? M.makeCloud9Hotbox(Math.random) : new Array(M.SIZE * M.SIZE).fill(0), cloud9 };
+// ---------------------------------------------------------------- the grow
+/**
+ * Feed the plant after a paid spin. A finished stage pays its own bonus: a jar pick, a pre-lit
+ * Hotbox for the coming spins, or a special free-spin round. Returns the bonus win.
+ */
+async function growOn(res, bet) {
+  const gained = M.leavesFor(res);
+  const { grow, grown } = M.advanceGrow(S.grow, res, bet);
+  if (gained > 0) play('growStep');
+  S.grow = grow;
+  drawGrow(gained > 0);
+  persistGrow();
+  if (!grown) return 0;
+
+  const stage = M.STAGES[grown.stage];
+  const bonusBet = cents(grown.avgBet); // paid on the average bet of this stage
+  await banner(t(`hk.stage.${stage.key}`).toUpperCase(), t(`hk.stageStory.${stage.key}`), 'harvest');
+  let win = 0;
+  if (stage.reward.type === 'pick') {
+    win = await jarPick(stage.reward.scale, bonusBet);
+  } else if (stage.reward.type === 'seed') {
+    // the plant lights up the grid: the coming base spins start on a charged Hotbox
+    S.hotbox = M.seedHotbox(stage.reward.cells, Math.random, S.hotbox);
+    applyHotboxSnapshot(S.hotbox);
+    play('bigsmoke');
+    await banner(t('hk.seedTitle', { n: stage.reward.cells }), t('hk.seedSub'), 'blaze');
+  } else {
+    const setup = M.growFreeSpins(stage.reward);
+    win = await freeSpins(setup.spins, !!stage.reward.cloud9, {
+      hotbox: setup.hotbox, bet: bonusBet,
+      title: t(`hk.stage.${stage.key}`).toUpperCase(), sub: t('hk.stageFs', { n: setup.spins }),
+    });
+  }
+  if (grown.stage === M.STAGES.length - 1) await banner(t('hk.growDone', { n: S.grow.plant }), t('hk.growNext'), 'tierUp');
+  drawGrow(false);
+  persistGrow();
+  return win;
+}
+
+function persistGrow() {
+  try { localStorage.setItem('hk.grow', JSON.stringify(S.grow)); } catch { /* private mode */ }
+}
+
+/** Jar pick: nine jars, the player opens three. All values were drawn by the math up front. */
+async function jarPick(scale, bonusBet) {
+  const { jars } = M.jarBonus(scale);
+  const d = dimmer();
+  motion.tween(d, { alpha: 0.72 }, 300);
+  const box = centerBox();
+  const title = new GoldText(900, 110, 58);
+  title.text = t('hk.jarTitle');
+  title.y = -330;
+  const sub = new GoldText(820, 70, 30, { palette: 'white', glow: 'rgba(0,0,0,.8)', stroke: '#031a0c' });
+  sub.y = -250;
+  const totalTxt = new GoldText(700, 120, 66);
+  totalTxt.y = 315;
+  totalTxt.alpha = 0;
+  box.addChild(title, sub, totalTxt);
+
+  let picks = M.JAR_PICKS, total = 0, next = 0;
+  const updateSub = () => { sub.text = t('hk.jarPicks', { n: picks }); };
+  updateSub();
+  const all = [];
+  await new Promise((resolve) => {
+    for (let i = 0; i < M.JARS; i++) {
+      const c = new Container();
+      c.position.set(((i % 3) - 1) * 250, Math.floor(i / 3) * 195 - 50);
+      const img = new Sprite(TEX.sym_bong);
+      img.anchor.set(0.5);
+      img.scale.set(165 / img.texture.width);
+      c.addChild(img);
+      c.eventMode = 'static';
+      c.cursor = 'pointer';
+      c.on('pointertap', () => {
+        if (c.eventMode === 'none' || picks <= 0) return;
+        c.eventMode = 'none';
+        const value = jars[next++];
+        total = cents(total + value * bonusBet);
+        picks--;
+        updateSub();
+        play(value >= 10 ? 'harvest' : 'growStep');
+        const val = new GoldText(300, 90, 50);
+        val.text = money(cents(value * bonusBet));
+        c.addChild(val);
+        val.scale.set(0.3);
+        motion.tween(val, { scale: 1 }, 400, ease.outBack);
+        motion.tween(img, { alpha: 0.35 }, 300);
+        for (let k = 0; k < 8; k++) motion.emit({ texture: TX.leafTint, parent: box, x: c.x, y: c.y, vx: (Math.random() - 0.5) * 460, vy: -240 - Math.random() * 380, gravity: 1400, life: 900, scale: 0.5, spin: (Math.random() - 0.5) * 10 });
+        if (picks === 0) {
+          totalTxt.text = money(total);
+          motion.tween(totalTxt, { alpha: 1 }, 300);
+          for (const o of all) {
+            if (o.eventMode === 'none') continue;
+            const v = new GoldText(300, 90, 38, { palette: 'white', glow: 'rgba(0,0,0,.7)', stroke: '#031a0c' });
+            v.text = money(cents(jars[next++] * bonusBet));
+            v.alpha = 0.7;
+            o.addChild(v);
+            o.eventMode = 'none';
+            motion.tween(o, { alpha: 0.55 }, 300);
+          }
+          motion.wait(1600).then(resolve);
+        }
+      });
+      all.push(c);
+      box.addChild(c);
+    }
+  });
+  await Promise.all([motion.tween(d, { alpha: 0 }, 350), motion.tween(box, { alpha: 0 }, 350)]);
+  d.destroy();
+  box.destroy({ children: true });
+  if (total > 0) await creditWin(total);
+  return total;
+}
+
+async function freeSpins(award, cloud9, opts = {}) {
+  const bet = opts.bet ?? S.bet; // grow stages pay on the average bet of that stage
+  S.fs = { left: award, played: 0, total: 0, hotbox: opts.hotbox ?? (cloud9 ? M.makeCloud9Hotbox(Math.random) : new Array(M.SIZE * M.SIZE).fill(0)), cloud9 };
   document.body.classList.add('fs');
   stopLoop('music', 1.2);
   loop('musicBonus');
-  await banner(cloud9 ? t('hk.cloud9') : t('hk.fsAward', { n: award }), cloud9 ? t('hk.cloud9Sub', { n: M.CLOUD9_SEED_CELLS }) : t('hk.fsSub'), cloud9 ? 'cloud9' : 'fsStart', cloud9 ? TEX.super_fs_intro : TEX.fs_intro);
+  await banner(opts.title ?? (cloud9 ? t('hk.cloud9') : t('hk.fsAward', { n: award })), opts.sub ?? (cloud9 ? t('hk.cloud9Sub', { n: M.CLOUD9_SEED_CELLS }) : t('hk.fsSub')), cloud9 ? 'cloud9' : 'fsStart', cloud9 ? TEX.super_fs_intro : TEX.fs_intro);
   motion.tween(bgFree, { alpha: 1 }, 1200);
   hud.fsCount.text = `0 / ${award}`;
   motion.tween(hud.fs, { alpha: 1 }, 500);
@@ -684,13 +864,13 @@ async function freeSpins(award, cloud9) {
     play('spin');
     await safePlay(res);
     S.fs.hotbox = res.hotbox;
-    S.fs.total = cents(S.fs.total + res.x * S.bet);
-    if (S.fs.total >= M.MAX_WIN_X * S.bet) { S.fs.total = M.MAX_WIN_X * S.bet; S.fs.left = 0; }
+    S.fs.total = cents(S.fs.total + res.x * bet);
+    if (S.fs.total >= M.MAX_WIN_X * bet) { S.fs.total = M.MAX_WIN_X * bet; S.fs.left = 0; }
     if (res.award) { S.fs.left += res.award; await banner(t('hk.fsRetrigger', { n: res.award }), null, 'tierUp'); }
     await motion.wait(300);
   }
 
-  const total = S.fs.total, x = total / S.bet;
+  const total = S.fs.total, x = total / bet;
   if (x >= TIERS[0][1]) await maybeBigWin(x, total);
   else await banner(money(total), t('hk.fsResult', { n: S.fs.played }), 'win');
   if (total > 0) await creditWin(total);
@@ -919,7 +1099,7 @@ async function creditWin(amount) {
 // buy price = avg value / 0.96, so the bought feature also returns ~96% RTP.
 // measured with scripts/sim-haze-buy.js (20,000 rounds each, 98 % play-money RTP): Munchies 10 spins
 // avg 90.2x, Cloud 9 30 spins avg 481.9x  →  /0.98 = 92.0x and 491.7x
-let fsPrice = 92, superPrice = 492;
+let fsPrice = 29.6, superPrice = 166.4; // measured averages / 0.98 (scripts/sim-haze-buy.js)
 function setBuyPrices(fs, sup) { fsPrice = fs; superPrice = sup; }
 
 async function buyFeature(kind) {

@@ -3,6 +3,7 @@
 // Deliberately shares nothing with Haze Kings (dub/trap) – each machine has its own voice.
 // Each entry is a synth fallback; a real file at public/assets/krakens-hoard/sfx/<name>.mp3 wins.
 import { Sound, midi } from '../../shared/sound.js';
+import { startMusic } from '../../shared/music.js';
 
 // D minor / D harmonic minor → "pirate" colour
 const SCALE = [62, 64, 65, 67, 69, 70, 73, 74, 76, 77, 79, 81, 82, 85, 86];
@@ -158,8 +159,8 @@ const R = {
   ocean: (s) => {
     // premium surf: deep swell + fine spray + slowly breathing waves, always behind the game
     const ctx = s.ctx;
-    const swell = s.noiseHit({ dur: 1, vol: 0.05, type: 'lowpass', freq: 380, q: 0.4, loop: true, attack: 4, wet: 0.5 });
-    const spray = s.noiseHit({ dur: 1, vol: 0.016, type: 'bandpass', freq: 2400, q: 0.5, loop: true, attack: 5, wet: 0.6 });
+    const swell = s.noiseHit({ dur: 1, vol: 0.03, type: 'lowpass', freq: 340, q: 0.4, loop: true, attack: 4, wet: 0.5 });
+    const spray = s.noiseHit({ dur: 1, vol: 0.008, type: 'bandpass', freq: 2200, q: 0.5, loop: true, attack: 5, wet: 0.6 });
     // three slow LFOs at unrelated rates: the waves never fall into an obvious pattern
     const mk = (rate, depth, target) => {
       const lfo = ctx.createOscillator(), g = ctx.createGain();
@@ -181,8 +182,9 @@ const R = {
     lfo.connect(lg).connect(wind.f.frequency); lfo.start();
     return { stop: (f) => { rain.stop(f); wind.stop(f); lfo.stop(s.ctx.currentTime + f); } };
   },
-  // Music only plays from a real file (sfx/music.mp3) – a synthesized drone just drones.
-  music: () => null,
+  // procedural soundtrack: a slow sea shanty on deck, the storm version in the free spins
+  music: (s) => startMusic(s, 'shanty', { vol: 0.42 }),
+  musicStorm: (s) => startMusic(s, 'tempest', { vol: 0.48 }),
 };
 
 export const sfx = new Sound(`${import.meta.env.BASE_URL}assets/krakens-hoard/sfx`, Object.keys(R), ['bigWin', 'coinLoop']); // real recordings in public/assets (see THIRD_PARTY.md)

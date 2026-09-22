@@ -28,19 +28,21 @@ export const HOTBOX_MAX = 64; // per-cell ceiling (lowered from the design doc's
 // lever that keeps RTP variance and Cloud 9's payout in a sane band (see doc for the rebalance).
 // fsScale: free-spin/Cloud 9 wins get their own flat multiplier on top of payScale, so the
 // free-spin and base-game economics can be tuned independently (like Kraken's Hoard's fsScale).
-export const TUNING = { payScale: 0.0510, blazeChance: 0.02, smokeChance: 0.018, multCap: 16, fsScale: 8.6 };
+export const TUNING = { payScale: 0.040, blazeChance: 0.02, smokeChance: 0.018, multCap: 16, fsScale: 2.2 }; // re-tuned with scripts/sim-session.js: more base-game wins, smaller but far more frequent features
 
 // pays per tier at cluster sizes [5,8,11,15,20+], in multiples of total bet (before payScale)
+// Flatter than a classic paytable on purpose: a small cluster – by far the most common win – has
+// to be worth something, the huge clusters stay exciting without eating the whole budget.
 export const SYMBOLS = {
-  king:       { pays: [2, 5, 15, 50, 150], weight: 2 },
-  bong:       { pays: [1.5, 3.5, 10, 30, 90], weight: 4 },
-  joint:      { pays: [1, 2.5, 7, 20, 60], weight: 6 },
-  grinder:    { pays: [0.8, 2, 5, 15, 45], weight: 8 },
-  lighter:    { pays: [0.6, 1.5, 4, 12, 35], weight: 10 },
-  bud_green:  { pays: [0.4, 1, 2.5, 7, 20], weight: 13 },
-  bud_purple: { pays: [0.4, 1, 2.5, 7, 20], weight: 13 },
-  bud_orange: { pays: [0.35, 0.9, 2.2, 6, 18], weight: 14 },
-  bud_blue:   { pays: [0.35, 0.9, 2.2, 6, 18], weight: 14 },
+  king:       { pays: [3.5, 7, 18, 45, 120], weight: 2 },
+  bong:       { pays: [2.8, 5.5, 13, 30, 80], weight: 4 },
+  joint:      { pays: [2.2, 4.2, 9.5, 22, 55], weight: 6 },
+  grinder:    { pays: [1.8, 3.4, 7, 16, 40], weight: 8 },
+  lighter:    { pays: [1.5, 2.8, 5.5, 13, 30], weight: 10 },
+  bud_green:  { pays: [1.1, 2.1, 4, 9, 20], weight: 13 },
+  bud_purple: { pays: [1.1, 2.1, 4, 9, 20], weight: 13 },
+  bud_orange: { pays: [1, 1.9, 3.6, 8, 18], weight: 14 },
+  bud_blue:   { pays: [1, 1.9, 3.6, 8, 18], weight: 14 },
   wild:       { pays: null, weight: 1.4 },
   scatter:    { pays: null, weight: 0.55 },
 };
@@ -68,6 +70,65 @@ export function makeCloud9Hotbox(rng) {
     hb[p] = 2;
   }
   return hb;
+}
+
+// ---------------------------------------------------------------------------------------------
+// THE GROW – the progression that runs through every session.
+// Every winning cluster and every scatter feeds the plant. Each stage pays out its own bonus;
+// after the harvest a new plant starts. Bonuses are part of the RTP budget (scripts/sim-session.js)
+// and pay in multiples of the AVERAGE bet of that stage, so raising the bet late gains nothing.
+export const GROW = { leavesScale: 1 };
+export const STAGES = [
+  { key: 'seedling', leaves: 165, reward: { type: 'pick', scale: 1.19 } },
+  { key: 'sprout', leaves: 210, reward: { type: 'seed', cells: 10 } },
+  { key: 'veg', leaves: 255, reward: { type: 'pick', scale: 1.82 } },
+  { key: 'flower', leaves: 300, reward: { type: 'fs', spins: 5, seed: 12 } },
+  { key: 'harvest', leaves: 360, reward: { type: 'fs', spins: 8, cloud9: true } },
+];
+export const JAR_VALUES = [[1, 30], [2, 26], [3, 18], [5, 12], [8, 7], [12, 4], [20, 2], [50, 1]]; // x avg bet, before stage scale
+export const JARS = 9, JAR_PICKS = 3;
+
+export const initialGrow = () => ({ stage: 0, leaves: 0, betSum: 0, spins: 0, plant: 1 });
+export const stageLeaves = (stage) => Math.round(STAGES[stage].leaves * GROW.leavesScale);
+
+/** Leaves a finished base-game spin feeds the plant: 1 per winning cluster, 2 per scatter. */
+export function leavesFor(result) {
+  let n = 0;
+  for (const s of result.steps) if (s.t === 'win') n += s.wins.length;
+  return n + 2 * Math.min(result.scatters ?? 0, 7);
+}
+
+/** Advance the grow after a paid base spin; `grown` = { stage, avgBet } when a stage is completed. */
+export function advanceGrow(g, result, bet) {
+  const next = { ...g, leaves: g.leaves + leavesFor(result), betSum: g.betSum + bet, spins: g.spins + 1 };
+  if (next.leaves < stageLeaves(next.stage)) return { grow: next, grown: null };
+  const grown = { stage: next.stage, avgBet: next.betSum / next.spins };
+  const last = next.stage === STAGES.length - 1;
+  return { grow: { stage: last ? 0 : next.stage + 1, leaves: 0, betSum: 0, spins: 0, plant: next.plant + (last ? 1 : 0) }, grown };
+}
+
+/** Jar pick: JARS jars with independent values, the player opens JAR_PICKS. */
+export function jarBonus(scale, rng = Math.random) {
+  const jars = Array.from({ length: JARS }, () => Math.round(weighted(JAR_VALUES, rng) * scale * 100) / 100);
+  return { jars, total: jars.slice(0, JAR_PICKS).reduce((a, b) => a + b, 0) }; // values are iid, so "the first three" = any three
+}
+
+/** Seed `n` random cells of a hotbox with x2 – used by the sprout reward and the flower free spins. */
+export function seedHotbox(n, rng = Math.random, hotbox = new Array(SIZE * SIZE).fill(0)) {
+  const hb = [...hotbox];
+  const used = new Set();
+  while (used.size < Math.min(n, SIZE * SIZE)) {
+    const p = Math.floor(rng() * SIZE * SIZE);
+    if (used.has(p)) continue;
+    used.add(p);
+    hb[p] = Math.max(hb[p], 2);
+  }
+  return hb;
+}
+
+/** Free-spin stage (flower / harvest): starts on a pre-lit Hotbox. */
+export function growFreeSpins(reward, rng = Math.random) {
+  return { spins: reward.spins, hotbox: reward.cloud9 ? makeCloud9Hotbox(rng) : seedHotbox(reward.seed ?? 0, rng) };
 }
 
 const weighted = (table, rng) => {

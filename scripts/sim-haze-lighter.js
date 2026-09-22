@@ -3,7 +3,7 @@
 import { spin, SIZE } from '../src/games/haze-kings/math.js';
 
 const N = Number(process.argv[2] || 300000);
-const COST = 3;
+const COST = Number(process.env.COST ?? 1.27); // keep in sync with LIGHTER_PRICE in main.js
 let won = 0, triggers = 0;
 for (let i = 0; i < N; i++) {
   const r = spin({ free: false, hotbox: new Array(SIZE * SIZE).fill(0), scatterBoost: 2 });

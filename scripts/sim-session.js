@@ -52,16 +52,42 @@ function krakenSpin(st) {
   return { x: Math.min(x, KH.MAX_WIN_X), feature };
 }
 
+if (env('HSCALE') != null) HK.TUNING.payScale = env('HSCALE');
+if (env('HFS') != null) HK.TUNING.fsScale = env('HFS');
+if (env('LEAVES') != null) HK.GROW.leavesScale = env('LEAVES');
+if (env('JAR') != null) HK.STAGES.forEach((s) => { if (s.reward.type === 'pick') s.reward.scale *= env('JAR'); });
+
+function playHazeFS(spins, hotbox) {
+  let hot = hotbox, left = spins, tot = 0;
+  while (left-- > 0) {
+    const f = HK.spin({ free: true, hotbox: hot });
+    hot = f.hotbox; tot += f.x; left += f.award;
+    if (tot >= HK.MAX_WIN_X) break;
+  }
+  return Math.min(tot, HK.MAX_WIN_X);
+}
+
+const hStats = { base: 0, fs: 0, stage: 0, stages: 0, fsCount: 0 };
 function hazeSpin(st) {
   const r = HK.spin({ free: false, hotbox: st.hot });
   st.hot = r.hotbox;
   let x = r.x, feature = false;
+  hStats.base += r.x;
   if (r.award) {
-    feature = true;
-    let hot = r.cloud9 ? HK.makeCloud9Hotbox(Math.random) : new Array(HK.SIZE * HK.SIZE).fill(0);
-    let left = r.award, tot = 0;
-    while (left-- > 0) { const f = HK.spin({ free: true, hotbox: hot }); hot = f.hotbox; tot += f.x; left += f.award; if (tot >= HK.MAX_WIN_X) break; }
-    x += Math.min(tot, HK.MAX_WIN_X);
+    feature = true; hStats.fsCount++;
+    const fsx = playHazeFS(r.award, r.cloud9 ? HK.makeCloud9Hotbox(Math.random) : new Array(HK.SIZE * HK.SIZE).fill(0));
+    x += fsx; hStats.fs += fsx;
+  }
+  const { grow, grown } = HK.advanceGrow(st.grow, r, 1);
+  st.grow = grow;
+  if (grown) {
+    feature = true; hStats.stages++;
+    const rw = HK.STAGES[grown.stage].reward;
+    let gx = 0;
+    if (rw.type === 'pick') gx = HK.jarBonus(rw.scale).total;
+    else if (rw.type === 'seed') st.hot = HK.seedHotbox(rw.cells, Math.random, st.hot ?? undefined); // value lands on the next spins
+    else { const setup = HK.growFreeSpins(rw); gx = playHazeFS(setup.spins, setup.hotbox); }
+    x += gx * grown.avgBet; hStats.stage += gx;
   }
   return { x: Math.min(x, HK.MAX_WIN_X), feature };
 }
@@ -85,7 +111,8 @@ function measure(name, spinFn, persistent, perSession) {
       if (i === 100 && bank > BANK) ahead100++;
     }
     if (peak > BANK * 1.2) peakAbove++;
-    Object.assign(persistent, st.voyage ? { voyage: st.voyage } : {});
+    if (st.voyage) persistent.voyage = st.voyage;
+    if (st.grow) persistent.grow = st.grow;
   }
   bustSpins.sort((a, b) => a - b);
   const pct = (v, n) => `${((v / n) * 100).toFixed(1)} %`;
@@ -105,4 +132,8 @@ if (!ONLY || ONLY === 'kraken') {
   const p = (v) => `${((v / n) * 100).toFixed(1)} %`;
   console.log(`  RTP split: base ${p(kStats.base)} · free spins ${p(kStats.fs)} (1 in ${Math.round(n / kStats.fsCount)}) · islands ${p(kStats.island)} (1 in ${Math.round(n / kStats.islands)}, avg ${(kStats.island / kStats.islands).toFixed(1)}x)`);
 }
-if (!ONLY || ONLY === 'haze') measure('Haze Kings 420', hazeSpin, {}, () => ({ hot: null }));
+if (!ONLY || ONLY === 'haze') {
+  const n = measure('Haze Kings 420', hazeSpin, { grow: HK.initialGrow() }, () => ({ hot: null }));
+  const p = (v) => `${((v / n) * 100).toFixed(1)} %`;
+  console.log(`  RTP split: base ${p(hStats.base)} · free spins ${p(hStats.fs)} (1 in ${Math.round(n / hStats.fsCount)}) · grow ${p(hStats.stage)} (1 in ${Math.round(n / hStats.stages)}, avg ${(hStats.stage / hStats.stages).toFixed(1)}x)`);
+}

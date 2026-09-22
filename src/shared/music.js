@@ -1,12 +1,16 @@
 // Procedural background music on the WebAudio clock (look-ahead scheduler).
-// Styles: 'reggae' – laid-back lo-fi one-drop with offbeat skank chords, walking bass, vinyl crackle;
-//         'trap'   – half-time bonus beat with 808 bass, rolling hats, dreamy pad.
+// Styles: 'reggae'  – laid-back lo-fi one-drop with offbeat skank chords, walking bass, vinyl crackle;
+//         'trap'    – half-time bonus beat with 808 bass, rolling hats, dreamy pad;
+//         'shanty'  – slow 6/8 sea shanty: strings, accordion chords, hand drum, no hiss (Kraken's Hoard);
+//         'tempest' – the storm version of the shanty: driving drums and brass (Kraken free spins).
 // Returns { stop(fade) } so it plugs into Sound.loop() as a synth "file".
 import { midi } from './sound.js';
 
 const PROGRESSIONS = {
   reggae: [[50, 53, 57, 60], [55, 58, 62, 65], [57, 60, 64, 67], [50, 53, 57, 60]], // Dm7 Gm7 Am7 Dm7
   trap: [[50, 53, 57, 62], [46, 50, 53, 58], [48, 52, 55, 60], [45, 49, 52, 57]], // Dm Bb C A
+  shanty: [[50, 53, 57], [46, 50, 53], [43, 46, 50], [45, 49, 52]], // Dm Bb Gm A – classic shanty turn
+  tempest: [[50, 53, 57], [48, 51, 55], [46, 50, 53], [45, 49, 52]], // Dm Cm Bb A
 };
 
 export function startMusic(s, style = 'reggae', { vol = 0.5 } = {}) {
@@ -16,13 +20,13 @@ export function startMusic(s, style = 'reggae', { vol = 0.5 } = {}) {
   bus.gain.linearRampToValueAtTime(vol, ctx.currentTime + 2);
   const lp = ctx.createBiquadFilter(); // warm "tape" top end
   lp.type = 'lowpass';
-  lp.frequency.value = style === 'reggae' ? 5200 : 9000;
+  lp.frequency.value = style === 'reggae' ? 5200 : style === 'shanty' ? 3800 : style === 'tempest' ? 5000 : 9000;
   bus.connect(lp).connect(s.master);
   const verb = ctx.createGain();
   verb.gain.value = 0.25;
   bus.connect(verb).connect(s.reverb);
 
-  const bpm = style === 'reggae' ? 76 : 70; // trap feels double-time on the hats
+  const bpm = style === 'reggae' ? 76 : style === 'shanty' ? 58 : style === 'tempest' ? 92 : 70; // trap feels double-time on the hats
   const beat = 60 / bpm, sixteenth = beat / 4;
   const prog = PROGRESSIONS[style];
   let step = 0, next = ctx.currentTime + 0.1, stopped = false;
@@ -58,6 +62,30 @@ export function startMusic(s, style = 'reggae', { vol = 0.5 } = {}) {
     for (const n of notes) { tone(t, 'sine', midi(n + 12), peak, d); tone(t, 'triangle', midi(n + 12) * 1.001, peak * 0.4, d * 0.8); }
   };
   const pad = (t, notes, d) => { for (const n of notes) { tone(t, 'sine', midi(n), 0.03, d, bus, 0.6); tone(t, 'triangle', midi(n + 12) * 1.003, 0.015, d, bus, 0.8); } };
+  // sea-shanty voices: bowed strings, accordion and a hand drum – no noise, so nothing hisses
+  const strings = (t, notes, d) => {
+    for (const n of notes) for (const det of [-6, 6]) {
+      const o = ctx.createOscillator(), g = ctx.createGain(), f = ctx.createBiquadFilter();
+      o.type = 'sawtooth';
+      o.frequency.value = midi(n);
+      o.detune.value = det;
+      f.type = 'lowpass'; f.frequency.value = 1100;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.linearRampToValueAtTime(0.035, t + d * 0.35);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+      o.connect(f).connect(g).connect(bus); o.start(t); o.stop(t + d + 0.1);
+    }
+  };
+  const accordion = (t, notes, d = 0.5, peak = 0.05) => {
+    for (const n of notes) { tone(t, 'square', midi(n + 12), peak * 0.5, d, bus, 0.03); tone(t, 'triangle', midi(n + 12) * 1.004, peak, d, bus, 0.03); }
+  };
+  const handDrum = (t, peak = 0.5, f0 = 150) => {
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.frequency.setValueAtTime(f0, t);
+    o.frequency.exponentialRampToValueAtTime(52, t + 0.3);
+    env(g, t, 0.002, peak, 0.35);
+    o.connect(g).connect(bus); o.start(t); o.stop(t + 0.6);
+  };
   const bass = (t, n, d, slide = 0) => {
     const o = ctx.createOscillator(), g = ctx.createGain(), f = ctx.createBiquadFilter();
     o.type = style === 'trap' ? 'sine' : 'triangle';
@@ -82,7 +110,17 @@ export function startMusic(s, style = 'reggae', { vol = 0.5 } = {}) {
   function schedule(i, t) {
     const bar = Math.floor(i / 16) % prog.length, pos = i % 16;
     const chord = prog[bar];
-    if (style === 'reggae') {
+    if (style === 'shanty' || style === 'tempest') {
+      // 6/8 feel over the 16-step grid: pulse on 0 and 6, answer on 10
+      const heavy = style === 'tempest';
+      if (pos === 0) { handDrum(t, heavy ? 0.6 : 0.45); strings(t, chord, beat * (heavy ? 2.6 : 3.4)); }
+      if (pos === 6) handDrum(t, heavy ? 0.4 : 0.28, 130);
+      if (heavy && pos === 10) handDrum(t, 0.35, 120);
+      if (pos === 4 || pos === 12) accordion(t, chord, heavy ? 0.35 : 0.55, heavy ? 0.055 : 0.042);
+      if (pos === 0 || pos === 8) bass(t, chord[0] - 12, beat * 1.4);
+      if (heavy && pos === 14) bass(t, chord[0] - 12 + 7, beat * 0.5, -7);
+      if (pos === 8 && Math.random() < (heavy ? 0.8 : 0.45)) accordion(t, [chord[0] + 12, chord[2] + 12], 0.4, 0.035); // melody answer
+    } else if (style === 'reggae') {
       if (pos === 8) { kick(t); rim(t); } // one-drop: kick + rim on beat 3
       if (pos % 2 === 0) hat(t, false, pos % 4 === 2 ? 0.08 : 0.04);
       if (pos === 14 && Math.random() < 0.4) hat(t, true, 0.05);
