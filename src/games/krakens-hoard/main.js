@@ -18,7 +18,7 @@ const cy = (r) => GY + r * CELL + CELL / 2;
 const BASE = `${import.meta.env.BASE_URL}assets/krakens-hoard/`;
 const BETS = [0.2, 0.4, 0.6, 1, 2, 4, 5, 10, 20, 50, 100];
 // bonus buy, x bet: measured avg free-spin value 45.7x / 0.98 = 46.6x (scripts/sim-kraken-fs.js, 1M spins)
-const BUY_PRICE_X = 47;
+const BUY_PRICE_X = 28; // measured average of the three storms / 0.96 (scripts/sim-kraken-fs.js)
 const TIERS = [['big', 15], ['mega', 30], ['epic', 50]];
 const SYM_SCALE = { captain: 1.06, wild: 1.1, scatter: 1.08, chest: 1.04, parrot: 1.04 };
 
@@ -38,6 +38,7 @@ const S = {
   // progression survives reloads: open planks + Kraken meter
   rows: clampInt(localStorage.getItem('kh.rows'), M.MIN_ROWS, M.MAX_ROWS, M.MIN_ROWS),
   meter: clampInt(localStorage.getItem('kh.meter'), 0, M.METER_MAX, 0),
+  voyage: readVoyage(),
   grid: null,
   slam: false,
   ledger: [], // { bet, win, balance } per paid spin – audited in debug mode
@@ -46,6 +47,15 @@ if (!BETS.includes(S.bet)) S.bet = 1;
 
 // every payout is rounded to whole cents before it touches the balance
 const cents = (v) => Math.round(v * 100) / 100;
+
+// the voyage survives page reloads – it is the long-term progression of the machine
+function readVoyage() {
+  try {
+    const v = JSON.parse(localStorage.getItem('kh.voyage'));
+    if (v && Number.isFinite(v.miles) && v.island >= 0 && v.island < M.ISLANDS.length) return { ...M.initialVoyage(), ...v };
+  } catch { /* corrupted or first run */ }
+  return M.initialVoyage();
+}
 
 function clampInt(v, lo, hi, dflt) {
   const n = Number.parseInt(v, 10);
@@ -56,6 +66,7 @@ function persist() {
   try {
     localStorage.setItem('kh.rows', String(S.fs ? S.fs.baseRows : S.rows));
     localStorage.setItem('kh.meter', String(S.meter));
+    localStorage.setItem('kh.voyage', JSON.stringify(S.voyage));
   } catch { /* private mode */ }
 }
 
@@ -365,6 +376,54 @@ function buildHud() {
   hud.addChild(meter);
   hud.meter = meter;
   drawMeter(S.meter, false);
+
+  // The voyage: nautical miles towards the next island on the chart
+  const voy = new Container();
+  const vl = new GoldText(460, 56, 26, { palette: 'white', glow: 'rgba(120,200,255,.8)', stroke: '#04121c' });
+  vl.y = -44;
+  const VW = 330, VH = 18;
+  const vtrack = new Graphics().roundRect(-VW / 2, -VH / 2, VW, VH, VH / 2).fill({ color: 0x061422, alpha: 0.85 }).stroke({ width: 3, color: 0xc9a14a });
+  const vfill = new Graphics();
+  const dots = new Container();
+  for (let i = 0; i < M.ISLANDS.length; i++) {
+    const d = new Graphics();
+    d.x = -VW / 2 + (VW / (M.ISLANDS.length - 1)) * i;
+    d.y = VH / 2 + 16;
+    dots.addChild(d);
+  }
+  const vcount = new GoldText(300, 40, 19, { palette: 'white', glow: 'rgba(0,0,0,.9)', stroke: '#04121c' });
+  vcount.y = 0;
+  voy.addChild(vl, vtrack, vfill, dots, vcount);
+  Object.assign(voy, { fillG: vfill, lbl: vl, count: vcount, dots, W: VW, H: VH });
+  hud.addChild(voy);
+  hud.voyage = voy;
+  drawVoyage(false);
+}
+
+/** Chart bar: progress to the next island plus a dot per island of this voyage. */
+function drawVoyage(pop = true) {
+  const v = hud.voyage;
+  if (!v) return;
+  const need = M.islandMiles(S.voyage.island);
+  const k = Math.min(S.voyage.miles / need, 1);
+  v.lbl.text = L(`kh.island.${M.ISLANDS[S.voyage.island].key}`).toUpperCase();
+  v.count.text = `${Math.floor(S.voyage.miles)} / ${need} sm`;
+  v.fillG.clear();
+  if (k > 0) {
+    const w = Math.max(v.H, v.W * k);
+    v.fillG.roundRect(-v.W / 2 + 3, -v.H / 2 + 3, w - 6, v.H - 6, (v.H - 6) / 2).fill({ color: 0x3db7ff });
+    v.fillG.roundRect(-v.W / 2 + 6, -v.H / 2 + 5, w - 12, (v.H - 6) / 3, 3).fill({ color: 0xffffff, alpha: 0.3 });
+  }
+  v.dots.children.forEach((d, i) => {
+    const done = i < S.voyage.island;
+    d.clear().circle(0, 0, done || i === S.voyage.island ? 7 : 5)
+      .fill({ color: done ? 0xf5c542 : i === S.voyage.island ? 0x3db7ff : 0x2a3a4a })
+      .stroke({ width: 2, color: done ? 0xfff3c4 : 0x0a1b28 });
+  });
+  if (pop) {
+    v.count.scale.set(1.3);
+    motion.tween(v.count, { scale: 1 }, 400, ease.outElastic);
+  }
 }
 
 // base game and free spins keep separate meters: base → Kraken strike, storm → Kraken's Wrath
@@ -416,14 +475,14 @@ const LAYOUTS = {
       logo: [L, bt + 60, 285], hudScale: 0.7,
       waysLbl: [R, bt + 10], ways: [R, bt + 68], maxLbl: [R, bt + 124],
       tumbleLbl: [R, bt + 230], tumble: [R, bt + 288], fs: [L, bt + 370],
-      meter: [R, bt + 420],
+      meter: [R, bt + 420], voyage: [R, bt + 560],
     };
   },
   portrait: (bt) => {
     const top = bt - FRAME_TOP - 330, fb = BB + FRAME_BOTTOM;
     return {
-      bounds: { x: GX - FRAME_SIDE - 4, y: top, w: GW + 2 * FRAME_SIDE + 8, h: fb + 240 - top },
-      meter: [GX + GW / 2, fb + 205],
+      bounds: { x: GX - FRAME_SIDE - 4, y: top, w: GW + 2 * FRAME_SIDE + 8, h: fb + 330 - top },
+      meter: [GX + GW / 2, fb + 205], voyage: [GX + GW / 2, fb + 285],
       logo: [GX + GW / 2, bt - FRAME_TOP - 160, 470], hudScale: 0.78,
       waysLbl: [GX + 120, fb + 30], ways: [GX + 120, fb + 78], maxLbl: [GX + 120, fb + 124],
       // free spins panel takes the logo's place (logo hides during free spins)
@@ -439,7 +498,7 @@ function applyHudLayout(L) {
   hud.logo.scale.set(L.logo[2] / hud.logo.texture.width);
   hud.logo.position.set(L.logo[0], L.logo[1]);
   hud.logo.baseY = L.logo[1];
-  for (const k of ['waysLbl', 'ways', 'maxLbl', 'tumbleLbl', 'tumble', 'fs', 'meter']) {
+  for (const k of ['waysLbl', 'ways', 'maxLbl', 'tumbleLbl', 'tumble', 'fs', 'meter', 'voyage']) {
     hud[k].position.set(...L[k]);
     hud[k].base = L.hudScale;
     if (!motion.tweens || ![...motion.tweens].some((t) => t.obj === hud[k])) hud[k].scale.set(L.hudScale);
@@ -1070,13 +1129,19 @@ async function playSpin(res) {
   placeBadges();
   S.grid = first.grid;
   await dropIn(first.grid, first.rows);
+  // A long cascade must never feel like a waiting room: from the fourth tumble on the
+  // playback speeds up step by step (rare, but then it runs at up to 3.5x).
+  const baseSpeed = motion.speed;
+  let chain = 0;
   for (const step of rest) {
+    if (step.t === 'tumble') motion.speed = baseSpeed * Math.min(3.5, 1 + Math.max(0, ++chain - 3) * 0.35);
     if (step.t === 'kraken') await krakenAttack(step);
     else if (step.t === 'wrath') await wrathAttack(step);
     else if (step.t === 'win') await showWin(step);
     else if (step.t === 'tumble') await doTumble(step);
     else if (step.t === 'scatter') await scatterCelebrate(step);
   }
+  motion.speed = baseSpeed;
   // no plank blasted this spin → one slams shut again
   if (res.rows < res.endRows) await plankSlams(res.rows);
   S.rows = res.rows;
@@ -1130,7 +1195,8 @@ async function spinOnce() {
   }
   let fsWin = 0;
   if (res.award) fsWin = await freeSpins(res.scatters);
-  S.ledger.push({ bet, win: win + fsWin, balance: wallet.balance });
+  const islandWin = await sailOn(res, bet);
+  S.ledger.push({ bet, win: win + fsWin + islandWin, balance: wallet.balance });
   motion.speed = S.turbo ? 1.9 : 1;
   S.busy = false;
   setBusy(false);
@@ -1279,14 +1345,22 @@ function chooseStorm(scatters) {
 
 async function freeSpins(scatters) {
   const key = await chooseStorm(scatters);
-  const setup = M.freeSpinSetup(key, scatters);
+  return freeSpinsRound(M.freeSpinSetup(key, scatters), L(`kh.opt.${key}`).toUpperCase());
+}
+
+/**
+ * Play one free-spin round from a ready-made setup (storm choice, bonus buy or an island).
+ * betOverride: island rounds pay on the average bet of the leg, not on the bet set right now.
+ */
+async function freeSpinsRound(setup, label, betOverride) {
+  const bet = betOverride ?? S.bet;
   // the storm is played on a fresh 4-row deck with its own Wrath meter; the base deck
   // (open planks) and base meter are restored afterwards
-  S.fs = { left: setup.spins, played: 0, total: 0, sticky: setup.sticky, meter: setup.meter, baseRows: S.rows, key };
+  S.fs = { left: setup.spins, played: 0, total: 0, sticky: setup.sticky, meter: setup.meter, baseRows: S.rows };
   let rows = M.MIN_ROWS;
   clearBadges();
   krakenRises();
-  await banner(L('kh.fsBanner', { n: setup.spins }), L(`kh.opt.${key}`).toUpperCase(), 'fsStart');
+  await banner(L('kh.fsBanner', { n: setup.spins }), label, 'fsStart');
   stopLoop('ocean');
   loop('storm');
   motion.tween(bgFree, { alpha: 1 }, 1500);
@@ -1307,8 +1381,8 @@ async function freeSpins(scatters) {
     await safePlay(res);
     rows = res.rows;
     S.fs.sticky = res.sticky;
-    S.fs.total = cents(S.fs.total + res.x * S.bet);
-    if (S.fs.total >= M.MAX_WIN_X * S.bet) { S.fs.total = M.MAX_WIN_X * S.bet; S.fs.left = 0; }
+    S.fs.total = cents(S.fs.total + res.x * bet);
+    if (S.fs.total >= M.MAX_WIN_X * bet) { S.fs.total = M.MAX_WIN_X * bet; S.fs.left = 0; }
     if (res.award) {
       S.fs.left += res.award;
       await banner(L('kh.fsMore', { n: res.award }), null, 'tierUp');
@@ -1317,7 +1391,7 @@ async function freeSpins(scatters) {
   }
 
   const total = S.fs.total;
-  const x = total / S.bet;
+  const x = total / bet;
   if (x >= TIERS[0][1]) await maybeBigWin(x, total);
   else await banner(money(total), L('kh.fsWin', { n: S.fs.played }), 'win');
   if (total > 0) await creditWin(total);
@@ -1342,6 +1416,113 @@ async function freeSpins(scatters) {
   await dropIn(S.grid, baseRows, false);
   persist();
   return total;
+}
+
+// ---------------------------------------------------------------- the voyage
+/**
+ * Sail on after a paid spin: add the nautical miles this spin earned and, when the chart's next
+ * island is reached, play its chapter. Returns the island win (0 if no island was reached).
+ */
+async function sailOn(res, bet) {
+  const gained = M.milesFor(res);
+  const { voyage, arrived } = M.advanceVoyage(S.voyage, res, bet);
+  if (gained > 0) play('voyageMile');
+  S.voyage = voyage;
+  drawVoyage(gained > 0);
+  persist();
+  if (!arrived) return 0;
+
+  const island = M.ISLANDS[arrived.island];
+  const bonusBet = cents(arrived.avgBet); // paid on the average bet of this leg – late bet changes gain nothing
+  await banner(L(`kh.island.${island.key}`).toUpperCase(), L(`kh.islandStory.${island.key}`), 'island');
+  let win = 0;
+  if (island.reward.type === 'pick') {
+    win = await chestPick(island.reward.scale, bonusBet);
+  } else {
+    win = await freeSpinsRound(M.islandFreeSpins(island.reward), L(`kh.island.${island.key}`).toUpperCase(), bonusBet);
+  }
+  if (arrived.island === M.ISLANDS.length - 1) await banner(L('kh.voyageDone', { n: S.voyage.voyage }), L('kh.voyageNext'), 'tierUp');
+  drawVoyage(false);
+  persist();
+  return win;
+}
+
+/** Treasure pick: nine chests, the player opens three. Values were drawn by the math up front. */
+async function chestPick(scale, bonusBet) {
+  const { chests } = M.chestBonus(scale);
+  const d = dimmer();
+  motion.tween(d, { alpha: 0.72 }, 300);
+  const box = centerBox();
+  const title = new GoldText(900, 110, 60);
+  title.text = L('kh.chestTitle');
+  title.y = -330;
+  const sub = new GoldText(800, 70, 30, { palette: 'white', glow: 'rgba(0,0,0,.8)', stroke: '#04121c' });
+  sub.y = -250;
+  const totalTxt = new GoldText(700, 120, 68);
+  totalTxt.y = 320;
+  totalTxt.alpha = 0;
+  box.addChild(title, sub, totalTxt);
+
+  let picks = M.CHEST_PICKS, total = 0, next = 0;
+  const updateSub = () => { sub.text = L('kh.chestPicks', { n: picks }); };
+  updateSub();
+
+  const opened = [];
+  await new Promise((resolve) => {
+    for (let i = 0; i < M.CHESTS; i++) {
+      const c = new Container();
+      c.position.set((i % 3 - 1) * 250, Math.floor(i / 3) * 210 - 60);
+      const img = new Sprite(TEX.sym_chest);
+      img.anchor.set(0.5);
+      img.scale.set(190 / img.texture.width);
+      c.addChild(img);
+      c.eventMode = 'static';
+      c.cursor = 'pointer';
+      c.on('pointertap', () => {
+        if (!c.eventMode || picks <= 0) return;
+        c.eventMode = 'none';
+        c.cursor = 'default';
+        const value = chests[next++];
+        total = cents(total + value * bonusBet);
+        picks--;
+        updateSub();
+        play(value * bonusBet >= bonusBet * 10 ? 'chestBig' : 'chestOpen');
+        const val = new GoldText(300, 90, 52);
+        val.text = money(cents(value * bonusBet));
+        val.y = -10;
+        c.addChild(val);
+        val.scale.set(0.3);
+        motion.tween(val, { scale: 1 }, 400, ease.outBack);
+        motion.tween(img, { alpha: 0.35 }, 300);
+        for (let k = 0; k < 10; k++) motion.emit({ texture: TX.coin, parent: box, x: c.x, y: c.y, vx: (Math.random() - 0.5) * 520, vy: -260 - Math.random() * 420, gravity: 1500, life: 900, scale: 0.3, spin: (Math.random() - 0.5) * 12 });
+        if (picks === 0) {
+          totalTxt.text = money(total);
+          motion.tween(totalTxt, { alpha: 1 }, 300);
+          // reveal what the other chests held – all values were drawn before the first pick
+          for (const o of opened) {
+            if (o.eventMode === 'none') continue;
+            const v = new GoldText(300, 90, 40, { palette: 'white', glow: 'rgba(0,0,0,.7)', stroke: '#04121c' });
+            v.text = money(cents(chests[next++] * bonusBet));
+            v.alpha = 0.7;
+            o.addChild(v);
+            o.eventMode = 'none';
+            motion.tween(o, { alpha: 0.55 }, 300);
+          }
+          motion.wait(1600).then(resolve);
+        }
+      });
+      opened.push(c);
+      box.addChild(c);
+    }
+  });
+  await fadeOverlay(d, box);
+  if (total > 0) await creditWin(total);
+  return total;
+}
+
+function fadeOverlay(d, box) {
+  return Promise.all([motion.tween(d, { alpha: 0 }, 350), motion.tween(box, { alpha: 0 }, 350)])
+    .then(() => { d.destroy(); box.destroy({ children: true }); });
 }
 
 // ---------------------------------------------------------------- overlays

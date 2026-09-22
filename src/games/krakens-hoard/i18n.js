@@ -3,6 +3,21 @@ import { register, applyI18n } from '../../shared/i18n.js';
 
 register({
   de: {
+    // the voyage
+    'kh.island.treasure': 'Schatzinsel',
+    'kh.island.smugglers': 'Schmugglerbucht',
+    'kh.island.ghostship': 'Geisterschiff',
+    'kh.island.sirens': 'Sirenenriff',
+    'kh.island.lair': 'Kraken-Höhle',
+    'kh.islandStory.treasure': 'Kapitel 1 · Die alte Karte führt an Land. Drei Truhen liegen im Sand.',
+    'kh.islandStory.smugglers': 'Kapitel 2 · In der Bucht lagert die Beute der Schmuggler. Greif zu.',
+    'kh.islandStory.ghostship': 'Kapitel 3 · Aus dem Nebel treibt ein Wrack heran – und seine Mannschaft dreht mit.',
+    'kh.islandStory.sirens': 'Kapitel 4 · Der Gesang lockt dich aufs Riff. Dort glitzert es zwischen den Felsen.',
+    'kh.islandStory.lair': 'Kapitel 5 · Das Wasser kocht. Der Kraken wartet auf dich – und auf seinen Schatz.',
+    'kh.voyageDone': 'REISE {n} GESCHAFFT',
+    'kh.voyageNext': 'Der Kraken versinkt. Eine neue Karte, eine neue Reise.',
+    'kh.chestTitle': 'WÄHLE DEINE TRUHEN',
+    'kh.chestPicks': 'Noch {n} Truhen öffnen',
     'kh.loading': 'Lade Schätze…',
     'kh.buyTitle': 'Freispiele kaufen',
     'kh.spinTitle': 'Drehen (Leertaste)',
@@ -56,6 +71,21 @@ register({
     'kh.pt.r8': 'Nur Spielgeld – kein Echtgeld, keine Auszahlung.',
   },
   en: {
+    // the voyage
+    'kh.island.treasure': 'Treasure Island',
+    'kh.island.smugglers': "Smugglers' Cove",
+    'kh.island.ghostship': 'Ghost Ship',
+    'kh.island.sirens': 'Siren Reef',
+    'kh.island.lair': "Kraken's Lair",
+    'kh.islandStory.treasure': 'Chapter 1 · The old map leads ashore. Three chests are waiting in the sand.',
+    'kh.islandStory.smugglers': 'Chapter 2 · The smugglers keep their loot in this cove. Help yourself.',
+    'kh.islandStory.ghostship': 'Chapter 3 · A wreck drifts out of the fog – and its crew spins along.',
+    'kh.islandStory.sirens': 'Chapter 4 · The song pulls you onto the reef, where something glitters between the rocks.',
+    'kh.islandStory.lair': 'Chapter 5 · The water boils. The Kraken is waiting for you – and for its hoard.',
+    'kh.voyageDone': 'VOYAGE {n} COMPLETE',
+    'kh.voyageNext': 'The Kraken sinks away. A new chart, a new voyage.',
+    'kh.chestTitle': 'PICK YOUR CHESTS',
+    'kh.chestPicks': '{n} chests left to open',
     'kh.loading': 'Loading treasure…',
     'kh.buyTitle': 'Buy Free Spins',
     'kh.spinTitle': 'Spin (Space)',

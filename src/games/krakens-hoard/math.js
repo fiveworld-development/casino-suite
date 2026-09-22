@@ -21,7 +21,7 @@ export const MAX_TUMBLES = 25; // safety cap per spin
 // Tuned with scripts/sim-krakens-hoard.js – see docs/01-krakens-hoard.md.
 // fsScale: free spins keep planks AND sticky Kraken reels open, so their per-way pay is lower
 // (real slots do this with separate free-spin reel sets).
-export const TUNING = { payScale: 0.1636, fsScale: 0.254, stack: 0.35, rowExp: 3 };
+export const TUNING = { payScale: 0.116, fsScale: 0.20, stack: 0.35, rowExp: 3 }; // re-tuned with scripts/sim-session.js: more base wins, smaller but far more frequent features
 
 // pays for 3,4,5,6 reels, in multiples of total bet (before payScale), per way
 export const SYMBOLS = {
@@ -64,11 +64,65 @@ export function freeSpinSetup(key, scatters, rng = Math.random) {
   const o = FS_OPTIONS[key];
   const sticky = [];
   const reels = o.sticky === 2 ? (rng() < 0.5 ? [1, 3] : [2, 4]) : o.sticky === 1 ? [1 + Math.floor(rng() * 4)] : [];
-  for (const reel of reels) sticky.push({ reel, mult: weighted(KRAKEN_MULTS.base, rng) }); // start reel: x2–x5
+  for (const reel of reels) sticky.push({ reel, mult: weighted(KRAKEN_MULTS.free, rng) }); // start reel: x2–x10
   return { spins: o.base + o.perScatter * (Math.min(scatters, 6) - 3), sticky, meter: o.wrath ? METER_MAX_FS : 0 };
 }
-export const LOOT = [['coin', 0.15], ['eye', 0.25]]; // remaining chance: empty plank
-export const COIN_VALUES = [[0.5, 45], [1, 30], [2, 15], [5, 8], [10, 2]]; // x bet
+// ---------------------------------------------------------------------------------------------
+// THE VOYAGE – the story that runs through every session.
+// Blasted planks, scatters and Kraken strikes earn nautical miles. Every island on the chart
+// pays out an island bonus; after the last island (the Kraken's lair) a new voyage begins.
+// Island bonuses are part of the RTP budget (scripts/sim-session.js) and are paid in multiples of
+// the AVERAGE bet played on the way there, so switching bets right before an island gains nothing.
+export const VOYAGE = { milesScale: 1 };
+export const ISLANDS = [
+  { key: 'treasure', miles: 121, reward: { type: 'pick', scale: 0.85 } },
+  { key: 'smugglers', miles: 143, reward: { type: 'pick', scale: 1.15 } },
+  { key: 'ghostship', miles: 165, reward: { type: 'fs', spins: 2, mults: [2] } },
+  { key: 'sirens', miles: 187, reward: { type: 'pick', scale: 1.5 } },
+  { key: 'lair', miles: 220, reward: { type: 'fs', spins: 3, mults: [3], wrath: true } },
+];
+export const CHEST_VALUES = [[1, 30], [2, 26], [3, 18], [5, 12], [8, 7], [12, 4], [20, 2], [50, 1]]; // x avg bet, before island scale
+export const CHESTS = 9, CHEST_PICKS = 3;
+
+export const initialVoyage = () => ({ island: 0, miles: 0, betSum: 0, spins: 0, voyage: 1 });
+export const islandMiles = (island) => Math.round(ISLANDS[island].miles * VOYAGE.milesScale);
+
+/** Miles a finished base-game spin earns: 1 per blasted plank, 2 per scatter, 3 per Kraken strike. */
+export function milesFor(result) {
+  let m = 0;
+  for (const s of result.steps) {
+    if (s.t === 'tumble' && s.grew) m += 1;
+    if (s.t === 'kraken' || s.t === 'wrath') m += 3;
+  }
+  return m + 2 * Math.min(result.scatters ?? 0, 6);
+}
+
+/**
+ * Advance the voyage after a paid base-game spin. Returns the new voyage state and, when an island
+ * is reached, `arrived` = { island, avgBet } – the caller then plays the island bonus.
+ */
+export function advanceVoyage(v, result, bet) {
+  const next = { ...v, miles: v.miles + milesFor(result), betSum: v.betSum + bet, spins: v.spins + 1 };
+  if (next.miles < islandMiles(next.island)) return { voyage: next, arrived: null };
+  const arrived = { island: next.island, avgBet: next.betSum / next.spins };
+  const last = next.island === ISLANDS.length - 1;
+  return { voyage: { island: last ? 0 : next.island + 1, miles: 0, betSum: 0, spins: 0, voyage: next.voyage + (last ? 1 : 0) }, arrived };
+}
+
+/** Treasure pick: CHESTS chests with independent values; the player opens CHEST_PICKS of them. */
+export function chestBonus(scale, rng = Math.random) {
+  const chests = Array.from({ length: CHESTS }, () => Math.round(weighted(CHEST_VALUES, rng) * scale * 100) / 100);
+  return { chests, total: chests.slice(0, CHEST_PICKS).reduce((a, b) => a + b, 0) }; // values are iid, so "the first three" = any three
+}
+
+/** Free-spin island (ghost ship / lair): starts with sticky Kraken reels (and a full Wrath meter in the lair). */
+export function islandFreeSpins(reward, rng = Math.random) {
+  const reels = [1, 3, 4].sort(() => rng() - 0.5).slice(0, reward.mults.length);
+  return { spins: reward.spins, sticky: reward.mults.map((mult, i) => ({ reel: reels[i], mult })), meter: reward.wrath ? METER_MAX_FS : 0 };
+}
+
+export const LOOT = [['coin', 0.24], ['eye', 0.24]]; // remaining chance: empty plank
+export const COIN_VALUES = [[1, 46], [2, 28], [3, 14], [5, 8], [10, 3], [25, 1]]; // x bet – a plank coin is always worth at least the bet
 
 const weighted = (table, rng) => {
   const total = table.reduce((a, [, w]) => a + w, 0);

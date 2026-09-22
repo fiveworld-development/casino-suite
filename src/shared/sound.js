@@ -130,6 +130,47 @@ export class Sound {
     return { src, f, g, stop: (fade = 0.5) => { g.gain.setTargetAtTime(0, ctx.currentTime, fade / 3); src.stop(ctx.currentTime + fade); } };
   }
 
+  /**
+   * Tape-style delay send (dub echo). Connect voices to the returned node.
+   * Kept per instance and reused: time in seconds, fb = feedback, mix = wet level.
+   */
+  echo({ time = 0.28, fb = 0.32, mix = 0.28, tone = 2600 } = {}) {
+    const key = `${time}|${fb}|${mix}|${tone}`;
+    if (this.echoes?.has(key)) return this.echoes.get(key);
+    const ctx = this.ctx;
+    const inp = ctx.createGain();
+    const d = ctx.createDelay(1);
+    d.delayTime.value = time;
+    const f = ctx.createBiquadFilter();
+    f.type = 'lowpass';
+    f.frequency.value = tone;
+    const g = ctx.createGain();
+    g.gain.value = fb;
+    const wet = ctx.createGain();
+    wet.gain.value = mix;
+    inp.connect(d).connect(f).connect(g).connect(d);
+    f.connect(wet).connect(this.master);
+    inp.connect(this.master);
+    (this.echoes ??= new Map()).set(key, inp);
+    return inp;
+  }
+
+  /** Drum voice: pitch-dropping body + optional click. Taiko (low, woody) through 808 (long sub). */
+  drum({ freq = 120, to = 45, dur = 0.5, vol = 0.5, at = 0, click = 0, type = 'sine', wet = 0.2, dest }) {
+    const ctx = this.ctx, t = ctx.currentTime + at;
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type;
+    o.frequency.setValueAtTime(freq, t);
+    o.frequency.exponentialRampToValueAtTime(to, t + dur * 0.6);
+    g.gain.setValueAtTime(vol, t);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g).connect(dest ?? this.out(1, wet));
+    o.start(t);
+    o.stop(t + dur + 0.05);
+    if (click) this.noiseHit({ dur: 0.03, vol: click, type: 'bandpass', freq: 2000, q: 1.5, at, wet: 0.1 });
+    return o;
+  }
+
   bell(freq, { at = 0, vol = 0.18, dur = 1.2 } = {}) {
     // inharmonic partials → metallic bell / coin shimmer
     [[1, 1], [2.76, 0.45], [5.4, 0.25], [8.93, 0.12]].forEach(([m, v]) =>

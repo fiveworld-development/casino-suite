@@ -106,6 +106,7 @@ async function start() {
   layout();
   app.ticker.add(tick);
   loop('music');
+  loop('vinyl'); // lounge room tone under everything
 
   if (params.has('debug')) window.HK = {
     audit(start) {
@@ -697,6 +698,7 @@ async function freeSpins(award, cloud9) {
   document.body.classList.remove('fs');
   stopLoop('musicBonus', 1.5);
   loop('music');
+  loop('vinyl'); // lounge room tone under everything
   clearHotbox();
   motion.tween(bgFree, { alpha: 0 }, 1200);
   motion.tween(hud.fs, { alpha: 0 }, 500).then(() => (hud.fs.visible = false));
