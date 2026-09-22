@@ -38,7 +38,7 @@ A pirate slot on the deck of a ship in a storm. Every winning tumble blasts a pl
 
 [Play Haze Kings 420](https://fiveworld-development.github.io/casino-suite/haze-kings.html)
 
-A 7×7 cluster slot in a lounge floating above the clouds. Wins light up the cells underneath them, and every further hit on a lit cell doubles its multiplier, up to ×64. The *Hotbox* stays lit from spin to spin until a dead spin clears it, so a good streak really carries. The Cloud 9 bonus starts with the grid already glowing.
+A 7×7 cluster slot in a lounge floating above the clouds. Wins light up the cells underneath them, and every further hit on a lit cell doubles its multiplier, up to ×16. The *Hotbox* stays lit from spin to spin until a dead spin clears it, so a good streak really carries. The Cloud 9 bonus starts with the grid already glowing.
 
 <div align="center"><img src="docs/screenshots/haze-kings-anim.webp" alt="Haze Kings 420 – Cloud 9 bonus" width="860"></div>
 
@@ -78,10 +78,12 @@ The slots are split into a pure maths module and a renderer that only plays back
 
 | Game | Result | Sample |
 |---|---|---|
-| Kraken's Hoard | about 98 % RTP | 1 million spins per free-spin storm |
-| Haze Kings 420 | 98.1 % RTP (± 1.5 %) | 4 million spins |
+| Kraken's Hoard | 98.2 % RTP (95.3 % at the 10,000 cap) | 2 million spins, all features running |
+| Haze Kings 420 | 97.7 % RTP (97.5 % at the 10,000 cap) | 3 million spins, all features running |
 | Blackjack | about 0.4 % house edge with basic strategy | 1 million hands |
 | Kush or Better | 99.54 % with perfect play | standard 9/6 paytable |
+
+One round (a spin plus every bonus it triggers) pays at most 150× the bet and never more than 10,000. On Kraken's Hoard a win of 5× or more comes about every 25 spins, 20× about every 120, 50× about every 430 and 100× about every 1,250.
 
 Cards are shuffled with the browser's cryptographic random generator. There are no fake near-misses and no losses dressed up as wins. Every game keeps a ledger you can check with `?debug`.
 

@@ -19,7 +19,19 @@ const cy = (r) => GY + r * CELL + CELL / 2;
 const BASE = `${import.meta.env.BASE_URL}assets/krakens-hoard/`;
 const BETS = [0.2, 0.4, 0.6, 1, 2, 4, 5, 10, 20, 50, 100];
 // bonus buy, x bet: measured avg free-spin value 45.7x / 0.98 = 46.6x (scripts/sim-kraken-fs.js, 1M spins)
-const BUY_PRICE_X = 28; // measured average of the three storms / 0.96 (scripts/sim-kraken-fs.js)
+const BUY_PRICE_X = 14.4; // measured average of the three storms / 0.96 (scripts/sim-kraken-fs.js)
+// Maximum win per round (a paid spin plus everything it triggers, or one bought bonus):
+// MAX_WIN_X times the bet, but never more than MAX_WIN_ABS – like the per-game win limits of real
+// casinos. At a bet of 1 that is 150, at a bet of 100 it is 10,000.
+const MAX_WIN_ABS = 10000;
+const roundCap = (bet) => Math.round(Math.min(M.MAX_WIN_X * bet, MAX_WIN_ABS) * 100) / 100;
+/** Pay at most what is left of this round's cap and book it. */
+function takeFromCap(amount) {
+  const pay = Math.min(amount, S.capLeft ?? amount);
+  if (S.capLeft != null) S.capLeft = Math.round((S.capLeft - pay) * 100) / 100;
+  return pay;
+}
+
 const TIERS = [['big', 15], ['mega', 30], ['epic', 50]];
 const SYM_SCALE = { captain: 1.06, wild: 1.1, scatter: 1.08, chest: 1.04, parrot: 1.04 };
 
@@ -879,6 +891,19 @@ function updateKrakenMulti() {
   hud.mult.text = sum ? `x${sum}` : '–';
 }
 
+// One text announcement at a time (plank loot, Kraken eye, max ways): they queue instead of
+// stacking on top of each other, and the floating win amount steps aside while one is showing.
+let announcing = 0;
+let announceQueue = Promise.resolve();
+function announce(show) {
+  announceQueue = announceQueue.then(async () => {
+    announcing++;
+    if (showWin.label && !showWin.label.destroyed) showWin.label.destroy();
+    try { await show(); } catch (e) { console.warn('[kraken] announcement failed', e); } finally { announcing--; }
+  });
+  return announceQueue;
+}
+
 async function showWin(step) {
   const win = new Set(step.cells.map(([c, r]) => `${c},${r}`));
   const level = Math.floor(Math.log2(1 + step.x * 4));
@@ -912,16 +937,19 @@ async function showWin(step) {
   // one floating amount at a time: a new tumble win replaces the previous label instead of
   // stacking on top of it; kept clear of the reel-top Kraken plaques
   if (showWin.label && !showWin.label.destroyed) showWin.label.destroy();
-  const ft = new GoldText(420, 90, 54);
-  showWin.label = ft;
-  ft.text = money(amt);
-  const top = GY + (M.MAX_ROWS - S.rows) * CELL;
-  ft.position.set(sx / step.cells.length, Math.max(sy / step.cells.length, top + CELL * 1.5));
-  ft.scale.set(0.3);
-  fxLayer.addChild(ft);
-  motion.tween(ft, { scale: 1 }, 400, ease.outBack)
-    .then(() => motion.tween(ft, { y: ft.y - 70, alpha: 0 }, 700, ease.inQuad, 350))
-    .then(() => { if (!ft.destroyed) ft.destroy(); });
+  if (announcing) { hud.tumble.text = money(S.fs ? S.fs.total + step.total * S.bet : step.total * S.bet); }
+  const ft = announcing ? null : new GoldText(420, 90, 54);
+  if (ft) {
+    showWin.label = ft;
+    ft.text = money(amt);
+    const top = GY + (M.MAX_ROWS - S.rows) * CELL;
+    ft.position.set(sx / step.cells.length, Math.max(sy / step.cells.length, top + CELL * 1.5));
+    ft.scale.set(0.3);
+    fxLayer.addChild(ft);
+    motion.tween(ft, { scale: 1 }, 400, ease.outBack)
+      .then(() => motion.tween(ft, { y: ft.y - 70, alpha: 0 }, 700, ease.inQuad, 350))
+      .then(() => { if (!ft.destroyed) ft.destroy(); });
+  }
 
   // running tumble total on the right
   const total = S.fs ? S.fs.total + step.total * S.bet : step.total * S.bet;
@@ -1050,14 +1078,16 @@ function chargeMeter(fromY, value) {
 // loot hidden behind the plank: coins (instant win) or a Kraken eye (+2 meter)
 function plankLoot(loot, y, total) {
   const cxm = GX + GW / 2;
-  const label = new GoldText(700, 120, loot.type === 'coin' ? 70 : 56, loot.type === 'coin' ? {} : { palette: 'white', glow: 'rgba(210,90,255,1)', stroke: '#1a0326' });
-  label.text = loot.type === 'coin' ? `+${money(loot.x * S.bet)}` : L('kh.krakenEye');
-  label.position.set(cxm, y);
-  label.scale.set(0.3);
-  fxLayer.addChild(label);
-  motion.tween(label, { scale: 1 }, 420, ease.outBack)
-    .then(() => motion.tween(label, { y: y - 90, alpha: 0 }, 700, ease.inQuad, 500))
-    .then(() => label.destroy());
+  announce(async () => {
+    const label = new GoldText(700, 120, loot.type === 'coin' ? 70 : 56, loot.type === 'coin' ? {} : { palette: 'white', glow: 'rgba(210,90,255,1)', stroke: '#1a0326' });
+    label.text = loot.type === 'coin' ? `+${money(loot.x * S.bet)}` : L('kh.krakenEye');
+    label.position.set(cxm, boardTop() + 70);
+    label.scale.set(0.3);
+    fxLayer.addChild(label);
+    await motion.tween(label, { scale: 1 }, 380, ease.outBack);
+    await motion.tween(label, { y: label.y - 60, alpha: 0 }, 550, ease.inQuad, 450);
+    label.destroy();
+  });
   if (loot.type === 'coin') {
     play('tierUp');
     for (let k = 0; k < 5; k++) setTimeout(() => play('coin'), k * 70);
@@ -1097,7 +1127,11 @@ function krakenSinks() {
 }
 
 // all planks gone: the whole hold is open
-async function maxWaysCelebration() {
+function maxWaysCelebration() {
+  return announce(() => maxWaysShow());
+}
+
+async function maxWaysShow() {
   play('tierUp');
   doShake(14, 700);
   const t = new GoldText(900, 150, 84);
@@ -1149,6 +1183,7 @@ async function playSpin(res) {
     else if (step.t === 'scatter') await scatterCelebrate(step);
   }
   motion.speed = baseSpeed;
+  await announceQueue; // queued messages finish before the win presentation starts
   // no plank blasted this spin → one slams shut again
   if (res.rows < res.endRows) await plankSlams(res.rows);
   S.rows = res.rows;
@@ -1195,7 +1230,8 @@ async function spinOnce() {
   if (forced) window.KH.forceNext = null;
   const res = forced ?? M.spin({ free: false, rows: S.rows, meter: S.meter });
   await safePlay(res);
-  const win = cents(res.x * bet);
+  S.capLeft = roundCap(bet);
+  const win = takeFromCap(cents(res.x * bet));
   if (win > 0) {
     await presentWin(res.x, win);
     await creditWin(win);
@@ -1316,6 +1352,7 @@ async function buyBonus(price) {
   S.busy = true;
   setBusy(true);
   setWinDisplay(0);
+  S.capLeft = roundCap(S.bet);
   let fsWin = 0;
   try {
     fsWin = await freeSpins(3);
@@ -1389,7 +1426,8 @@ async function freeSpinsRound(setup, label, betOverride) {
     rows = res.rows;
     S.fs.sticky = res.sticky;
     S.fs.total = cents(S.fs.total + res.x * bet);
-    if (S.fs.total >= M.MAX_WIN_X * bet) { S.fs.total = M.MAX_WIN_X * bet; S.fs.left = 0; }
+    const cap = S.capLeft ?? roundCap(bet);
+    if (S.fs.total >= cap) { S.fs.total = cap; S.fs.left = 0; }
     if (res.award) {
       S.fs.left += res.award;
       await banner(L('kh.fsMore', { n: res.award }), null, 'tierUp');
@@ -1397,7 +1435,7 @@ async function freeSpinsRound(setup, label, betOverride) {
     await motion.wait(350);
   }
 
-  const total = S.fs.total;
+  const total = takeFromCap(S.fs.total);
   const x = total / bet;
   if (x >= TIERS[0][1]) await maybeBigWin(x, total);
   else await banner(money(total), L('kh.fsWin', { n: S.fs.played }), 'win');
@@ -1492,7 +1530,7 @@ async function chestPick(scale, bonusBet) {
         c.eventMode = 'none';
         c.cursor = 'default';
         const value = chests[next++];
-        total = cents(total + value * bonusBet);
+        total = Math.min(cents(total + value * bonusBet), S.capLeft ?? Infinity);
         picks--;
         updateSub();
         play(value * bonusBet >= bonusBet * 10 ? 'chestBig' : 'chestOpen');
@@ -1525,6 +1563,7 @@ async function chestPick(scale, bonusBet) {
     }
   });
   await fadeOverlay(d, box);
+  total = takeFromCap(total);
   if (total > 0) await creditWin(total);
   stopLoop('musicStorm', 1.2);
   loop('music', { music: true });

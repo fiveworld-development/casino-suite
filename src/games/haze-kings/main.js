@@ -29,9 +29,21 @@ const BASE = `${import.meta.env.BASE_URL}assets/haze-kings/`;
 const BETS = [0.2, 0.4, 0.6, 1, 2, 4, 5, 10, 20, 50, 100];
 // Lucky Lighter: measured with scripts/sim-haze-lighter.js – one boosted spin returns 3.09x bet on
 // average; the player also pays the normal bet for that spin, so 98 % needs 3.09 / 0.98 − 1 ≈ 2.15x.
-const LIGHTER_PRICE = 1.27; // measured: the lighter returns ~1.25x on average (scripts/sim-haze-lighter.js)
+const LIGHTER_PRICE = 1.18; // measured: the lighter returns ~1.16x on average (scripts/sim-haze-lighter.js)
+// Maximum win per round (a paid spin plus everything it triggers, or one bought bonus):
+// MAX_WIN_X times the bet, but never more than MAX_WIN_ABS – like the per-game win limits of real
+// casinos. At a bet of 1 that is 150, at a bet of 100 it is 10,000.
+const MAX_WIN_ABS = 10000;
+const roundCap = (bet) => Math.round(Math.min(M.MAX_WIN_X * bet, MAX_WIN_ABS) * 100) / 100;
+/** Pay at most what is left of this round's cap and book it. */
+function takeFromCap(amount) {
+  const pay = Math.min(amount, S.capLeft ?? amount);
+  if (S.capLeft != null) S.capLeft = Math.round((S.capLeft - pay) * 100) / 100;
+  return pay;
+}
+
 const TIERS = [['big', 15], ['mega', 30], ['epic', 50], ['legendary', 200]];
-const HOTBOX_COLOR = (v) => (v >= 64 ? 0xffffff : v >= 16 ? 0xb24bff : v >= 8 ? 0xffd23c : 0x7dff5a); // green → gold → purple → white (max x64)
+const HOTBOX_COLOR = (v) => (v >= 16 ? 0xffffff : v >= 8 ? 0xb24bff : v >= 4 ? 0xffd23c : 0x7dff5a); // green → gold → purple → white (max x16)
 
 const SYM_LIST = M.PAYING.concat(['wild', 'scatter']);
 const IMAGES = [
@@ -703,7 +715,8 @@ async function spinOnce() {
   const res = M.spin({ free: false, scatterBoost, hotbox: S.hotbox }, Math.random);
   S.hotbox = res.hotbox;
   await safePlay(res);
-  const win = cents(res.x * bet);
+  S.capLeft = roundCap(bet);
+  const win = takeFromCap(cents(res.x * bet));
   let fsWin = 0, credited = false;
   // presentation/credit/free-spins can never be allowed to skip the ledger entry or leave the
   // game stuck busy – if an animation step throws, still settle the books and recover.
@@ -805,7 +818,7 @@ async function jarPick(scale, bonusBet) {
         if (c.eventMode === 'none' || picks <= 0) return;
         c.eventMode = 'none';
         const value = jars[next++];
-        total = cents(total + value * bonusBet);
+        total = Math.min(cents(total + value * bonusBet), S.capLeft ?? Infinity);
         picks--;
         updateSub();
         play(value >= 10 ? 'harvest' : 'growStep');
@@ -838,6 +851,7 @@ async function jarPick(scale, bonusBet) {
   await Promise.all([motion.tween(d, { alpha: 0 }, 350), motion.tween(box, { alpha: 0 }, 350)]);
   d.destroy();
   box.destroy({ children: true });
+  total = takeFromCap(total);
   if (total > 0) await creditWin(total);
   return total;
 }
@@ -865,12 +879,13 @@ async function freeSpins(award, cloud9, opts = {}) {
     await safePlay(res);
     S.fs.hotbox = res.hotbox;
     S.fs.total = cents(S.fs.total + res.x * bet);
-    if (S.fs.total >= M.MAX_WIN_X * bet) { S.fs.total = M.MAX_WIN_X * bet; S.fs.left = 0; }
+    const cap = S.capLeft ?? roundCap(bet);
+    if (S.fs.total >= cap) { S.fs.total = cap; S.fs.left = 0; }
     if (res.award) { S.fs.left += res.award; await banner(t('hk.fsRetrigger', { n: res.award }), null, 'tierUp'); }
     await motion.wait(300);
   }
 
-  const total = S.fs.total, x = total / bet;
+  const total = takeFromCap(S.fs.total), x = total / bet;
   if (x >= TIERS[0][1]) await maybeBigWin(x, total);
   else await banner(money(total), t('hk.fsResult', { n: S.fs.played }), 'win');
   if (total > 0) await creditWin(total);
@@ -1098,7 +1113,7 @@ async function creditWin(amount) {
 // buy price = avg value / 0.96, so the bought feature also returns ~96% RTP.
 // measured with scripts/sim-haze-buy.js (20,000 rounds each, 98 % play-money RTP): Munchies 10 spins
 // avg 90.2x, Cloud 9 30 spins avg 481.9x  →  /0.98 = 92.0x and 491.7x
-let fsPrice = 29.6, superPrice = 166.4; // measured averages / 0.98 (scripts/sim-haze-buy.js)
+let fsPrice = 22.8, superPrice = 99; // measured averages / 0.98 (scripts/sim-haze-buy.js)
 function setBuyPrices(fs, sup) { fsPrice = fs; superPrice = sup; }
 
 async function buyFeature(kind) {
@@ -1109,6 +1124,7 @@ async function buyFeature(kind) {
   if (kind === 'lighter') { S.luckyLighter = 1; S.ledger.push({ bet: price, win: 0, balance: wallet.balance }); return; }
   S.busy = true;
   setBusy(true);
+  S.capLeft = roundCap(S.bet);
   const award = M.FREE_SPINS_AWARD[kind === 'cloud9' ? 7 : 3]; // exactly what the price was measured for
   const winTotal = await freeSpins(award, kind === 'cloud9');
   S.ledger.push({ bet: price, win: winTotal, balance: wallet.balance });

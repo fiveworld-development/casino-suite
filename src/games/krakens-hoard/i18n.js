@@ -68,9 +68,9 @@ register({
     'kh.pt.r2': '<b>Tumble:</b> Gewinnsymbole explodieren, neue fallen nach – solange weitere Gewinne entstehen.',
     'kh.pt.r3': '<b>Planken sprengen:</b> Jeder Tumble-Gewinn sprengt eine Plankenreihe auf. Das Deck wächst von 4 auf bis zu 8 Reihen – von 4.096 auf 262.144 Gewinnwege.',
     'kh.pt.r4': '<b>Das Deck bleibt offen:</b> Gesprengte Planken bleiben über Spins hinweg offen. Wird in einem Spin keine Planke gesprengt, schlägt eine wieder zu. Größere Decks zahlen pro Gewinnweg weniger, insgesamt aber deutlich mehr.',
-    'kh.pt.r5': '<b>Beute hinter Planken:</b> Münzen (Sofortgewinn 0,5x–10x) oder Kraken-Augen (+2 Meter).',
+    'kh.pt.r5': '<b>Beute hinter Planken:</b> Münzen (Sofortgewinn 1x–25x) oder Kraken-Augen (+2 Meter).',
     'kh.pt.r6': '<b>Freispiele im Sturm:</b> Starten auf einem frischen 4-Reihen-Deck. Kraken-Walzen bleiben bis zum Ende der Freispiele kleben (max. 2). Danach kehrt dein Deck zurück.',
-    'kh.pt.r7': 'Theoretischer RTP: 98 % (Spielgeld-Modus). Volatilität: mittel – häufige Gewinne, regelmäßige Aufschwünge. Max. Gewinn: 10.000x Einsatz.',
+    'kh.pt.r7': 'Auszahlungsquote ca. 97–98 % (Spielgeld, per Simulation verifiziert). Volatilität: mittel – häufige Gewinne, regelmäßige Aufschwünge. Max. Gewinn pro Runde (Spin inkl. aller Boni): 150x Einsatz, höchstens 10.000.',
     'kh.pt.r8': 'Nur Spielgeld – kein Echtgeld, keine Auszahlung.',
   },
   en: {
@@ -135,9 +135,9 @@ register({
     'kh.pt.r2': '<b>Tumble:</b> winning symbols explode and new ones drop in – as long as new wins form.',
     'kh.pt.r3': '<b>Blast the planks:</b> every tumble win blasts open a row of planks. The deck grows from 4 up to 8 rows – from 4,096 to 262,144 ways to win.',
     'kh.pt.r4': '<b>The deck stays open:</b> blasted planks stay open across spins. If a spin blasts no plank, one slams shut again. Bigger decks pay less per way, but much more overall.',
-    'kh.pt.r5': '<b>Loot behind planks:</b> coins (instant win 0.5x–10x) or Kraken eyes (+2 meter).',
+    'kh.pt.r5': '<b>Loot behind planks:</b> coins (instant win 1x–25x) or Kraken eyes (+2 meter).',
     'kh.pt.r6': '<b>Storm Free Spins:</b> start on a fresh 4-row deck. Kraken reels stay sticky until the end of Free Spins (max. 2). Afterwards your deck returns.',
-    'kh.pt.r7': 'Theoretical RTP: 98% (play money mode). Volatility: medium – frequent wins, regular upswings. Max win: 10,000x bet.',
+    'kh.pt.r7': 'Payout rate about 97–98% (play money, verified by simulation). Volatility: medium – frequent wins, regular upswings. Max win per round (spin incl. all bonuses): 150x bet, at most 10,000.',
     'kh.pt.r8': 'Play money only – no real money, no payouts.',
   },
 });

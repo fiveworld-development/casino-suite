@@ -113,6 +113,7 @@ function measure(name, spinFn, persistent, perSession) {
     if (peak > BANK * 1.2) peakAbove++;
     if (st.voyage) persistent.voyage = st.voyage;
     if (st.grow) persistent.grow = st.grow;
+    if (st.base) persistent.base = st.base;
   }
   bustSpins.sort((a, b) => a - b);
   const pct = (v, n) => `${((v / n) * 100).toFixed(1)} %`;
@@ -128,7 +129,8 @@ function measure(name, spinFn, persistent, perSession) {
 }
 
 if (!ONLY || ONLY === 'kraken') {
-  const n = measure("Kraken's Hoard", krakenSpin, { voyage: KH.initialVoyage() }, () => ({ base: KH.initialState() }));
+  // the deck (open planks) and the meter persist between sessions in the real game (localStorage) – so they do here
+  const n = measure("Kraken's Hoard", krakenSpin, { voyage: KH.initialVoyage(), base: KH.initialState() }, () => ({}));
   const p = (v) => `${((v / n) * 100).toFixed(1)} %`;
   console.log(`  RTP split: base ${p(kStats.base)} · free spins ${p(kStats.fs)} (1 in ${Math.round(n / kStats.fsCount)}) · islands ${p(kStats.island)} (1 in ${Math.round(n / kStats.islands)}, avg ${(kStats.island / kStats.islands).toFixed(1)}x)`);
 }

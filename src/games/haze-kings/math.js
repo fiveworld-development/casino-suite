@@ -19,16 +19,16 @@
 
 export const SIZE = 7;
 export const MIN_CLUSTER = 5;
-export const MAX_WIN_X = 5000; // honest cap: millions of simulated spins peak around ~2,000x
+export const MAX_WIN_X = Number(globalThis.process?.env?.HMAX ?? 150); // max win per round (spin + its bonus) – see scripts/sim-bigwins.js
 export const MAX_TUMBLES = 40; // hard safety cap per spin – cascades can never run forever
-export const HOTBOX_MAX = 64; // per-cell ceiling (lowered from the design doc's x1024 – see docs/07-haze-kings.md)
+export const HOTBOX_MAX = 16; // per-cell ceiling (lowered from the design doc's x1024 – see docs/07-haze-kings.md)
 
 // Tuned with scripts/sim-haze-kings.js – see docs/07-haze-kings.md.
 // multCap: hard ceiling on the SUMMED hotbox multiplier applied to one cluster's win – the real
 // lever that keeps RTP variance and Cloud 9's payout in a sane band (see doc for the rebalance).
 // fsScale: free-spin/Cloud 9 wins get their own flat multiplier on top of payScale, so the
 // free-spin and base-game economics can be tuned independently (like Kraken's Hoard's fsScale).
-export const TUNING = { payScale: 0.040, blazeChance: 0.02, smokeChance: 0.018, multCap: 16, fsScale: 2.2 }; // re-tuned with scripts/sim-session.js: more base-game wins, smaller but far more frequent features
+export const TUNING = { payScale: 0.056, blazeChance: 0.02, smokeChance: 0.018, multCap: 8, fsScale: 1.9 }; // re-tuned with scripts/sim-session.js: more base-game wins, smaller but far more frequent features
 
 // pays per tier at cluster sizes [5,8,11,15,20+], in multiples of total bet (before payScale)
 // Flatter than a classic paytable on purpose: a small cluster – by far the most common win – has

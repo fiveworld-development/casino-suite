@@ -13,7 +13,7 @@
 export const COLS = 6;
 export const MIN_ROWS = 4;
 export const MAX_ROWS = 8;
-export const MAX_WIN_X = 10000;
+export const MAX_WIN_X = Number(globalThis.process?.env?.KMAX ?? 150); // max win per round (spin + its bonus) – see scripts/sim-bigwins.js
 export const METER_MAX = 30;
 export const METER_MAX_FS = Number(globalThis.process?.env?.MFS ?? 10); // Kraken's Wrath needs a full meter – charges faster in the storm
 export const MAX_TUMBLES = 25; // safety cap per spin
@@ -21,7 +21,7 @@ export const MAX_TUMBLES = 25; // safety cap per spin
 // Tuned with scripts/sim-krakens-hoard.js – see docs/01-krakens-hoard.md.
 // fsScale: free spins keep planks AND sticky Kraken reels open, so their per-way pay is lower
 // (real slots do this with separate free-spin reel sets).
-export const TUNING = { payScale: 0.116, fsScale: 0.20, stack: 0.35, rowExp: 3 }; // re-tuned with scripts/sim-session.js: more base wins, smaller but far more frequent features
+export const TUNING = { payScale: 0.186, fsScale: 0.08, stack: 0.35, rowExp: Number(globalThis.process?.env?.ROWEXP ?? 3.3) }; // re-tuned with scripts/sim-session.js: more base wins, smaller but far more frequent features
 
 // pays for 3,4,5,6 reels, in multiples of total bet (before payScale), per way
 export const SYMBOLS = {
@@ -81,7 +81,7 @@ export const ISLANDS = [
   { key: 'sirens', miles: 187, reward: { type: 'pick', scale: 1.5 } },
   { key: 'lair', miles: 220, reward: { type: 'fs', spins: 3, mults: [3], wrath: true } },
 ];
-export const CHEST_VALUES = [[1, 30], [2, 26], [3, 18], [5, 12], [8, 7], [12, 4], [20, 2], [50, 1]]; // x avg bet, before island scale
+export const CHEST_VALUES = [[1, 28], [2, 26], [3, 19], [5, 14], [8, 8], [12, 4], [20, 1]]; // x avg bet, before island scale
 export const CHESTS = 9, CHEST_PICKS = 3;
 
 export const initialVoyage = () => ({ island: 0, miles: 0, betSum: 0, spins: 0, voyage: 1 });
