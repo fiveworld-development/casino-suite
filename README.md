@@ -78,12 +78,12 @@ The slots are split into a pure maths module and a renderer that only plays back
 
 | Game | Result | Sample |
 |---|---|---|
-| Kraken's Hoard | 98.2 % RTP (95.3 % at the 10,000 cap) | 2 million spins, all features running |
-| Haze Kings 420 | 97.7 % RTP (97.5 % at the 10,000 cap) | 3 million spins, all features running |
+| Kraken's Hoard | 98.2 % RTP | 2 million spins, all features running |
+| Haze Kings 420 | 97.7 % RTP | 3 million spins, all features running |
 | Blackjack | about 0.4 % house edge with basic strategy | 1 million hands |
 | Kush or Better | 99.54 % with perfect play | standard 9/6 paytable |
 
-One round (a spin plus every bonus it triggers) pays at most 150× the bet and never more than 10,000. On Kraken's Hoard a win of 5× or more comes about every 25 spins, 20× about every 120, 50× about every 430 and 100× about every 1,250.
+One round (a spin plus every bonus it triggers) pays at most 150× the bet, at every bet size. On Kraken's Hoard a win of 5× or more comes about every 25 spins, 20× about every 120, 50× about every 430 and 100× about every 1,250.
 
 Cards are shuffled with the browser's cryptographic random generator. There are no fake near-misses and no losses dressed up as wins. Every game keeps a ledger you can check with `?debug`.
 

@@ -70,7 +70,7 @@ register({
     'kh.pt.r4': '<b>Das Deck bleibt offen:</b> Gesprengte Planken bleiben über Spins hinweg offen. Wird in einem Spin keine Planke gesprengt, schlägt eine wieder zu. Größere Decks zahlen pro Gewinnweg weniger, insgesamt aber deutlich mehr.',
     'kh.pt.r5': '<b>Beute hinter Planken:</b> Münzen (Sofortgewinn 1x–25x) oder Kraken-Augen (+2 Meter).',
     'kh.pt.r6': '<b>Freispiele im Sturm:</b> Starten auf einem frischen 4-Reihen-Deck. Kraken-Walzen bleiben bis zum Ende der Freispiele kleben (max. 2). Danach kehrt dein Deck zurück.',
-    'kh.pt.r7': 'Auszahlungsquote ca. 97–98 % (Spielgeld, per Simulation verifiziert). Volatilität: mittel – häufige Gewinne, regelmäßige Aufschwünge. Max. Gewinn pro Runde (Spin inkl. aller Boni): 150x Einsatz, höchstens 10.000.',
+    'kh.pt.r7': 'Auszahlungsquote ca. 97–98 % (Spielgeld, per Simulation verifiziert). Volatilität: mittel – häufige Gewinne, regelmäßige Aufschwünge. Max. Gewinn pro Runde (Spin inkl. aller Boni): 150x Einsatz.',
     'kh.pt.r8': 'Nur Spielgeld – kein Echtgeld, keine Auszahlung.',
   },
   en: {
@@ -137,7 +137,7 @@ register({
     'kh.pt.r4': '<b>The deck stays open:</b> blasted planks stay open across spins. If a spin blasts no plank, one slams shut again. Bigger decks pay less per way, but much more overall.',
     'kh.pt.r5': '<b>Loot behind planks:</b> coins (instant win 1x–25x) or Kraken eyes (+2 meter).',
     'kh.pt.r6': '<b>Storm Free Spins:</b> start on a fresh 4-row deck. Kraken reels stay sticky until the end of Free Spins (max. 2). Afterwards your deck returns.',
-    'kh.pt.r7': 'Payout rate about 97–98% (play money, verified by simulation). Volatility: medium – frequent wins, regular upswings. Max win per round (spin incl. all bonuses): 150x bet, at most 10,000.',
+    'kh.pt.r7': 'Payout rate about 97–98% (play money, verified by simulation). Volatility: medium – frequent wins, regular upswings. Max win per round (spin incl. all bonuses): 150x bet.',
     'kh.pt.r8': 'Play money only – no real money, no payouts.',
   },
 });

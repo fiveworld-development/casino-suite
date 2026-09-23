@@ -21,10 +21,9 @@ const BETS = [0.2, 0.4, 0.6, 1, 2, 4, 5, 10, 20, 50, 100];
 // bonus buy, x bet: measured avg free-spin value 45.7x / 0.98 = 46.6x (scripts/sim-kraken-fs.js, 1M spins)
 const BUY_PRICE_X = 14.4; // measured average of the three storms / 0.96 (scripts/sim-kraken-fs.js)
 // Maximum win per round (a paid spin plus everything it triggers, or one bought bonus):
-// MAX_WIN_X times the bet, but never more than MAX_WIN_ABS – like the per-game win limits of real
-// casinos. At a bet of 1 that is 150, at a bet of 100 it is 10,000.
-const MAX_WIN_ABS = 10000;
-const roundCap = (bet) => Math.round(Math.min(M.MAX_WIN_X * bet, MAX_WIN_ABS) * 100) / 100;
+// MAX_WIN_X times the bet at every bet size – like the per-game win limits of real
+// casinos. At a bet of 1 that is 150, at a bet of 100 it is 15,000.
+const roundCap = (bet) => Math.round((M.MAX_WIN_X * bet) * 100) / 100;
 /** Pay at most what is left of this round's cap and book it. */
 function takeFromCap(amount) {
   const pay = Math.min(amount, S.capLeft ?? amount);
@@ -1291,13 +1290,25 @@ async function presentWin(x, amount) {
   val.text = money(0);
   val.y = 20;
   plate.addChild(glow, lbl, val);
+  const hot = x >= 5; // 5x+ comes about every 25 spins – it deserves a real moment
+  if (hot) {
+    lbl.text = L(x >= 10 ? 'common.greatWin' : 'common.niceWin');
+    glow.tint = 0x3a1800;
+    glow.alpha = 0.85;
+    play('tierUp');
+    doShake(x >= 10 ? 10 : 6, x >= 10 ? 600 : 400);
+  }
   plate.scale.set(0.4);
   plate.alpha = 0;
   fxLayer.addChild(plate);
   motion.tween(plate, { alpha: 1 }, 150);
-  await motion.tween(plate, { scale: 1 }, 380, ease.outBack);
+  await motion.tween(plate, { scale: hot ? 1.12 : 1 }, 380, ease.outBack);
+  if (hot) {
+    const n = x >= 10 ? 40 : 22;
+    for (let k = 0; k < n; k++) motion.emit({ texture: TX.coin, parent: fxLayer, x: plate.x + (Math.random() - 0.5) * 200, y: plate.y, vx: (Math.random() - 0.5) * 900, vy: -500 - Math.random() * 500, gravity: 1500, life: 1300, scale: 0.22 + Math.random() * 0.2, spin: (Math.random() - 0.5) * 12 });
+  }
   const counter = { v: 0 };
-  const dur = Math.min(400 + x * 120, 1600);
+  const dur = x >= 5 ? Math.min(1400 + x * 60, 2400) : Math.min(400 + x * 120, 1600);
   const iv = setInterval(() => { val.text = money(counter.v); play('tick'); }, 60);
   await motion.tween(counter, { v: amount }, dur, ease.outQuad);
   clearInterval(iv);
