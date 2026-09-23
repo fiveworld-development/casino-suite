@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#03060c">
+  <title>Kraken's Hoard – Free Pirate Slot Online (Play Money, No Download)</title>
+  <!-- seo -->
+  <meta name="description" content="Free pirate slot in your browser: tumbling reels that grow from 4,096 to 262,144 ways, Kraken wild reels with multipliers, three free-spin storms and wins up to 150x. Play money only.">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <meta name="author" content="Dominik Bloechinger">
+  <link rel="canonical" href="https://fiveworld-development.github.io/casino-suite/krakens-hoard.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Casino Suite">
+  <meta property="og:title" content="Kraken's Hoard – Free Pirate Slot Online (Play Money, No Download)">
+  <meta property="og:description" content="Free pirate slot in your browser: tumbling reels that grow from 4,096 to 262,144 ways, Kraken wild reels with multipliers, three free-spin storms and wins up to 150x. Play money only.">
+  <meta property="og:url" content="https://fiveworld-development.github.io/casino-suite/krakens-hoard.html">
+  <meta property="og:image" content="https://fiveworld-development.github.io/casino-suite/og-image.jpg">
+  <meta property="og:image:width" content="1280">
+  <meta property="og:image:height" content="640">
+  <meta property="og:image:alt" content="Casino Suite – Kraken's Hoard, Haze Kings 420, Blackjack and Texas Hold'em">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Kraken's Hoard – Free Pirate Slot Online (Play Money, No Download)">
+  <meta name="twitter:description" content="Free pirate slot in your browser: tumbling reels that grow from 4,096 to 262,144 ways, Kraken wild reels with multipliers, three free-spin storms and wins up to 150x. Play money only.">
+  <meta name="twitter:image" content="https://fiveworld-development.github.io/casino-suite/og-image.jpg">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoGame","name":"Kraken's Hoard","url":"https://fiveworld-development.github.io/casino-suite/krakens-hoard.html","description":"Free pirate slot in your browser: tumbling reels that grow from 4,096 to 262,144 ways, Kraken wild reels with multipliers, three free-spin storms and wins up to 150x. Play money only.","image":"https://fiveworld-development.github.io/casino-suite/og-image.jpg","genre":"Slot machine","gamePlatform":"Web browser","applicationCategory":"Game","operatingSystem":"Any","playMode":"SinglePlayer","inLanguage":["en","de"],"isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"author":{"@type":"Person","name":"Dominik Bloechinger","url":"https://github.com/fiveworld-development"},"codeRepository":"https://github.com/fiveworld-development/casino-suite"}</script>
+  <!-- /seo -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@600;800&family=Inter:wght@500;700;800&display=swap" rel="stylesheet">
+  <script type="module" crossorigin src="./assets/krakensHoard-DSixmcyX.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/wallet-iw__mo_-.js">
+  <link rel="modulepreload" crossorigin href="./assets/music-control-2dbbCwG0.js">
+  <link rel="modulepreload" crossorigin href="./assets/textures-Cl1Lds57.js">
+  <link rel="stylesheet" crossorigin href="./assets/wallet-CjF07yZD.css">
+  <link rel="stylesheet" crossorigin href="./assets/music-control-kOSv9m-3.css">
+  <link rel="stylesheet" crossorigin href="./assets/krakensHoard-BQ1L3uWO.css">
+</head>
+<body>
+  <div id="stage"></div>
+
+  <div id="loader" data-bg="./assets/krakens-hoard/bg_main.webp">
+    <img src="./assets/krakens-hoard/logo.webp" alt="Kraken's Hoard" class="load-logo">
+    <div class="load-track"><div id="load-bar"></div></div>
+    <div id="load-text" data-i18n="kh.loading">Lade Schätze…</div>
+    <button id="load-start" data-i18n="load.play" hidden>Spielen</button>
+    <p class="load-note" data-i18n="load.note">Spielgeld · Kein Echtgeld · 18+</p>
+  </div>
+
+  <div id="bar">
+    <div class="left">
+      <a class="icon" href="./" title="Lobby" data-i18n-title="common.lobby">
+        <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" /></svg>
+      </a>
+      <button class="icon" id="info" title="Spielinfo" data-i18n-title="common.info"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg></button>
+      <button class="icon" id="sound" title="Ton" data-i18n-title="common.sound"><svg viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z"/><path class="wave" d="M16.5 8.5a5 5 0 010 7M19 6a8.5 8.5 0 010 12"/></svg></button>
+        <button class="icon" id="music" title="Musik" data-i18n-title="common.music"><svg viewBox="0 0 24 24"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.6"/><circle cx="16.5" cy="16" r="2.6"/></svg></button>
+      <button class="buy-btn" id="buy" title="Freispiele kaufen" data-i18n-title="kh.buyTitle"><span>BONUS</span><b id="buy-price">–</b></button>
+    </div>
+
+    <div class="stats">
+      <div class="stat" id="balance-box"><label><span data-i18n="common.balance">Guthaben</span> <em data-i18n="common.playMoney">Spielgeld</em></label><span id="balance">0,00</span><button id="refill" title="Spielgeld auffüllen" data-i18n-title="common.refill">+</button></div>
+      <div class="stat win"><label data-i18n="common.win">Gewinn</label><span id="win" data-v="0">0,00</span></div>
+    </div>
+
+    <div class="controls">
+      <div class="betbox">
+        <button id="bet-minus" class="round sm">−</button>
+        <div class="stat"><label data-i18n="common.bet">Einsatz</label><span id="bet">1,00</span></div>
+        <button id="bet-plus" class="round sm">+</button>
+      </div>
+      <button id="turbo" class="round md" title="Turbo"><svg viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg></button>
+      <button id="spin" title="Drehen (Leertaste)" data-i18n-title="kh.spinTitle">
+        <svg viewBox="0 0 48 48"><path d="M38 24a14 14 0 11-4.1-9.9"/><path d="M34 6v8.5h-8.5"/></svg>
+      </button>
+      <div class="autowrap">
+        <button id="auto" class="round md" title="Autoplay"><svg viewBox="0 0 24 24"><path d="M7 5v14l11-7z"/></svg><i id="auto-count"></i></button>
+        <div id="auto-menu" hidden>
+          <button data-n="10">10</button><button data-n="25">25</button><button data-n="50">50</button><button data-n="100">100</button><button data-n="99999">∞</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- free spin choice: same average value, different risk -->
+  <div class="storm-pick" id="storm-pick" hidden>
+    <h2 data-i18n="kh.pick.title">WÄHLE DEINEN STURM</h2>
+    <p class="sp-sub" data-i18n="kh.pick.sub">Alle drei sind im Schnitt gleich viel wert – nur das Risiko ist anders.</p>
+    <div class="sp-cards">
+      <button class="sp-card" data-k="storm">
+        <img src="./assets/krakens-hoard/sym_scatter.webp" alt="">
+        <h3 data-i18n="kh.opt.storm">Sturmflut</h3><b class="sp-spins" data-k="storm">10</b><em data-i18n="kh.pick.fs">Freispiele</em>
+        <p data-i18n="kh.pick.storm">Viele Spins. Das Wrath-Meter füllt sich unterwegs.</p>
+        <i class="vol"><s style="width:35%"></s></i><small data-i18n="kh.risk.low">Risiko niedrig</small>
+      </button>
+      <button class="sp-card" data-k="hunt">
+        <img src="./assets/krakens-hoard/sym_wild.webp" alt="">
+        <h3 data-i18n="kh.opt.hunt">Kraken-Jagd</h3><b class="sp-spins" data-k="hunt">5</b><em data-i18n="kh.pick.fs">Freispiele</em>
+        <p data-i18n="kh.pick.hunt">Startet mit einer klebrigen Kraken-Walze (x2–x5).</p>
+        <i class="vol"><s style="width:65%"></s></i><small data-i18n="kh.risk.mid">Risiko mittel</small>
+      </button>
+      <button class="sp-card" data-k="fury">
+        <img src="./assets/krakens-hoard/kraken_tentacle.webp" alt="">
+        <h3 data-i18n="kh.opt.fury">Tiefsee-Wut</h3><b class="sp-spins" data-k="fury">6</b><em data-i18n="kh.pick.fs">Freispiele</em>
+        <p data-i18n="kh.pick.fury">Kraken's Wrath im ersten Spin: drei Walzen werden wild.</p>
+        <i class="vol"><s style="width:90%"></s></i><small data-i18n="kh.risk.high">Risiko hoch</small>
+      </button>
+    </div>
+  </div>
+
+  <div class="storm-pick" id="buy-confirm" hidden>
+    <h2 data-i18n="kh.buy.title">FREISPIELE KAUFEN</h2>
+    <p class="sp-sub" data-i18n="kh.buy.sub">Du wählst danach deinen Sturm. Preis berechnet aus dem gemessenen Durchschnittswert (98 %).</p>
+    <div class="buy-actions">
+      <button class="cta-gold" id="buy-yes"><span data-i18n="kh.buy.yes">KAUFEN</span> · <span id="buy-price-2"></span></button>
+      <button class="cta-ghost" id="buy-no" data-i18n="common.cancel">Abbrechen</button>
+    </div>
+  </div>
+
+  <div id="paytable" hidden>
+    <div class="pt-card">
+      <button id="pt-close" class="icon" title="Schließen" data-i18n-title="common.close">✕</button>
+      <h2>Kraken's Hoard</h2>
+      <p class="pt-sub"><span data-i18n="kh.pt.sub">Auszahlung pro Gewinnweg bei Einsatz</span> <b id="pt-bet"></b> <span data-i18n="kh.pt.sub2">und deinem aktuellen Deck</span></p>
+      <div id="pt-symbols"></div>
+      <div class="pt-special">
+        <div><img src="./assets/krakens-hoard/sym_chest.webp" alt=""><p data-i18n-html="kh.pt.voyage"><b>DIE REISE</b> – jede gesprengte Planke, jeder Kompass und jeder Kraken-Angriff bringt Seemeilen. Fünf Inseln: Schatzinsel, Schmugglerbucht, Geisterschiff, Sirenenriff, Kraken-Höhle. Jede Insel zahlt ihren eigenen Bonus (Truhen-Auswahl oder Sonder-Freispiele). Nach der Kraken-Höhle beginnt eine neue Reise. Boni zahlen auf den Durchschnittseinsatz der Etappe.</p></div>
+        <div><img src="./assets/krakens-hoard/sym_wild.webp" alt=""><p data-i18n-html="kh.pt.wild"><b>KRAKEN WILD</b> – ersetzt alle Symbole außer Bonus. Erscheint auf Walze 2–5.</p></div>
+        <div><img src="./assets/krakens-hoard/kraken_tentacle.webp" alt=""><p data-i18n-html="kh.pt.strike"><b>KRAKEN-ANGRIFF</b> – jede gesprengte Planke lädt das Kraken-Meter. Bei 30 greift der Kraken garantiert an (selten auch zufällig): eine Walze wird komplett wild mit <b>x2–x5</b> (Freispiele bis <b>x10</b>). Die Walze bleibt für alle Kaskaden des Spins. Mehrere Kraken-Multiplikatoren werden addiert.</p></div>
+        <div><img src="./assets/krakens-hoard/sym_scatter.webp" alt=""><p data-i18n-html="kh.pt.scatter"><b>BONUS-KOMPASS</b> – 3+ Kompasse starten die Freispiele. Du wählst deinen Sturm: <b>Sturmflut</b> (viele Spins), <b>Kraken-Jagd</b> (startet mit Kraken-Walze) oder <b>Tiefsee-Wut</b> (startet mit Kraken's Wrath). Alle drei sind im Schnitt gleich viel wert. Jeder Kompass über 3 bringt Zusatz-Spins, 3+ in den Freispielen = +5.</p></div>
+        <div><img src="./assets/krakens-hoard/kraken_tentacle_sea.webp" alt=""><p data-i18n-html="kh.pt.wrath"><b>KRAKEN'S WRATH</b> – in den Freispielen lädt jede gesprengte Planke das Wrath-Meter (10). Ist es voll, reißt der Kraken <b>drei Walzen gleichzeitig</b> wild.</p></div>
+      </div>
+      <h3 data-i18n="kh.pt.rules">Regeln</h3>
+      <ul>
+        <li data-i18n-html="kh.pt.r1">6 Walzen, Gewinne von links nach rechts ab Walze 1 auf benachbarten Walzen (mind. 3).</li>
+        <li data-i18n-html="kh.pt.r2"><b>Tumble:</b> Gewinnsymbole explodieren, neue fallen nach – solange weitere Gewinne entstehen.</li>
+        <li data-i18n-html="kh.pt.r3"><b>Planken sprengen:</b> Jeder Tumble-Gewinn sprengt eine Plankenreihe auf. Das Deck wächst von 4 auf bis zu 8 Reihen – von 4.096 auf 262.144 Gewinnwege.</li>
+        <li data-i18n-html="kh.pt.r4"><b>Das Deck bleibt offen:</b> Gesprengte Planken bleiben über Spins hinweg offen. Wird in einem Spin keine Planke gesprengt, schlägt eine wieder zu. Größere Decks zahlen pro Gewinnweg weniger, insgesamt aber deutlich mehr.</li>
+        <li data-i18n-html="kh.pt.r5"><b>Beute hinter Planken:</b> Münzen (Sofortgewinn 1x–25x) oder Kraken-Augen (+2 Meter).</li>
+        <li data-i18n-html="kh.pt.r6"><b>Freispiele im Sturm:</b> Starten auf einem frischen 4-Reihen-Deck. Kraken-Walzen bleiben bis zum Ende der Freispiele kleben (max. 2). Danach kehrt dein Deck zurück.</li>
+        <li data-i18n-html="kh.pt.r7">Auszahlungsquote ca. 97–98 % (Spielgeld, per Simulation verifiziert). Volatilität: mittel – häufige Gewinne, regelmäßige Aufschwünge. Max. Gewinn pro Runde (Spin inkl. aller Boni): 150x Einsatz.</li>
+        <li data-i18n-html="kh.pt.r8">Nur Spielgeld – kein Echtgeld, keine Auszahlung.</li>
+      </ul>
+    </div>
+  </div>
+
+</body>
+</html>
