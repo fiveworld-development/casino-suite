@@ -20,7 +20,9 @@
 .mp-row { display: flex; align-items: center; gap: 10px; }
 .mp-ico { width: 22px; height: 22px; flex: none; fill: none; stroke: rgba(255, 255, 255, .7); stroke-width: 2.2; stroke-linejoin: round; }
 .mp-val { min-width: 48px; text-align: right; font-weight: 800; font-size: 14px; font-variant-numeric: tabular-nums; color: #ffe9a8; }
-.music-panel.muted .mp-val { color: rgba(255, 255, 255, .5); }
+.mp-sec + .mp-sec { margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, .12); }
+.mp-sec .mp-head { min-height: 36px; }
+.mp-sec.muted .mp-val { color: rgba(255, 255, 255, .5); }
 
 /* the slider: 44px tall touch target, 30px thumb, filled track */
 .mp-slider {
@@ -41,6 +43,6 @@
   width: 30px; height: 30px; border: 0; border-radius: 50%;
   background: radial-gradient(circle at 40% 35%, #fff8dc, #f2c350 60%, #b27a1d); box-shadow: 0 2px 8px rgba(0, 0, 0, .6);
 }
-.music-panel.muted .mp-slider { opacity: .55; }
+.mp-sec.muted .mp-slider { opacity: .55; }
 .mp-slider:focus-visible { outline: none; }
 .mp-slider:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 4px rgba(255, 233, 168, .6); }

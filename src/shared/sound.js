@@ -16,6 +16,9 @@ export class Sound {
     // background music sits well under the game by default; the player can set it 0..1
     const v = Number(localStorage.getItem('arcade.musicVolume'));
     this.musicVolume = Number.isFinite(v) && localStorage.getItem('arcade.musicVolume') !== null ? Math.min(1, Math.max(0, v)) : 0.35;
+    // sound effects volume 0..1 (everything except the background music), default full
+    const fx = Number(localStorage.getItem('arcade.sfxVolume'));
+    this.sfxVolume = Number.isFinite(fx) && localStorage.getItem('arcade.sfxVolume') !== null ? Math.min(1, Math.max(0, fx)) : 1;
     this.ctx = null;
     this.loops = new Map();
   }
@@ -24,13 +27,16 @@ export class Sound {
   async unlock() {
     if (this.ctx) return this.ctx.resume();
     const ctx = (this.ctx = new AudioContext());
-    this.master = ctx.createGain();
-    this.master.gain.value = this.muted ? 0 : 0.8;
+    this.main = ctx.createGain(); // global sound switch
+    this.main.gain.value = this.muted ? 0 : 0.8;
     const comp = ctx.createDynamicsCompressor();
-    this.master.connect(comp).connect(ctx.destination);
+    this.main.connect(comp).connect(ctx.destination);
+    this.master = ctx.createGain(); // every sound effect (and the bonus music) runs through here
+    this.master.gain.value = this.sfxVolume;
+    this.master.connect(this.main);
     this.musicBus = ctx.createGain(); // only the background music runs through here
     this.musicBus.gain.value = this.musicMuted ? 0 : this.musicVolume;
-    this.musicBus.connect(this.master);
+    this.musicBus.connect(this.main);
     this.reverb = this.makeReverb();
     this.reverb.connect(this.master);
     const len = ctx.sampleRate * 2;
@@ -55,7 +61,14 @@ export class Sound {
   setMuted(m) {
     this.muted = m;
     localStorage.setItem('arcade.muted', m ? '1' : '0');
-    if (this.master) this.master.gain.setTargetAtTime(m ? 0 : 0.8, this.ctx.currentTime, 0.05);
+    if (this.main) this.main.gain.setTargetAtTime(m ? 0 : 0.8, this.ctx.currentTime, 0.05);
+  }
+
+  /** Sound effects volume 0..1 (saved, shared by all games). */
+  setSfxVolume(v) {
+    this.sfxVolume = Math.min(1, Math.max(0, v));
+    localStorage.setItem('arcade.sfxVolume', String(this.sfxVolume));
+    if (this.master) this.master.gain.setTargetAtTime(this.sfxVolume, this.ctx.currentTime, 0.05);
   }
 
   /** Background music on/off – independent of the global sound switch. */

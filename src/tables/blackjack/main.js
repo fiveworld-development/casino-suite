@@ -13,6 +13,7 @@ import { buildCardTextures, CardView } from '../kit/cards.js';
 import { chipBreakdown } from '../kit/chips.js';
 import { BlackjackGame, handValue, dealerShouldHit, resolveHand, resolveInsurance, canSplit, canDouble, splitHand, cents } from './engine.js';
 import { sfx, play, loop } from './sfx.js';
+import { mountMusicControl } from '../../shared/music-control.js';
 
 const TBASE = `${import.meta.env.BASE_URL}assets/tables/`;
 const BBASE = `${import.meta.env.BASE_URL}assets/blackjack/`;
@@ -402,7 +403,7 @@ function buildUI() {
   $('help-close').onclick = () => ($('help').hidden = true);
   $('refill').onclick = () => { const before = wallet.balance; wallet.refill(); S.start += wallet.balance - before; play('click'); refreshUI(); };
   $('btn-sound').classList.toggle('off', sfx.muted);
-  $('btn-sound').onclick = () => { sfx.setMuted(!sfx.muted); $('btn-sound').classList.toggle('off', sfx.muted); };
+  mountMusicControl($('btn-sound'), sfx, { music: false });
 
   window.addEventListener('keydown', (e) => {
     if (e.repeat) return;

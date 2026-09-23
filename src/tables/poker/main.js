@@ -17,6 +17,7 @@ import { Table, Player, BUY_IN, BIG_BLIND } from './holdem.js';
 import { PERSONALITIES } from './ai.js';
 import { payoutFor, solveBestHold } from './videopoker.js';
 import { sfx, play, loop } from './sfx.js';
+import { mountMusicControl } from '../../shared/music-control.js';
 
 const $ = (id) => document.getElementById(id);
 const TBASE = `${import.meta.env.BASE_URL}assets/tables/`;
@@ -925,7 +926,7 @@ function buildUI() {
   $('help-close').onclick = () => ($('help').hidden = true);
   $('refill').onclick = () => { const before = wallet.balance; wallet.refill(); S.start += wallet.balance - before; play('click'); refreshStats(); };
   $('btn-sound').classList.toggle('off', sfx.muted);
-  $('btn-sound').onclick = () => { sfx.setMuted(!sfx.muted); $('btn-sound').classList.toggle('off', sfx.muted); };
+  mountMusicControl($('btn-sound'), sfx, { music: false });
 
   // closing / reloading the page while seated: the table stack goes back to the wallet
   // (chips already in the current pot are forfeited, like walking away from a live hand)
